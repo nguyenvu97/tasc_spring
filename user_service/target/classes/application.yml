@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: user_service
+  cloud:
+    discovery:
+      enabled: true
+  datasource:
+    url: jdbc:mysql://localhost:3300/user_service
+    username: root
+    password: Vu123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+      show_sql: true
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+    instance:
+    preferIpAddress: true
+server:
+  port: 8083
+application:
+  security:
+    jwt:
+      private-key: MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC6BekBZIumvwQR9EHwqLQJIr1ZMEtXxpQZzZCg95OCPEuBT318FDjcjD0Bm+z65MK1AhVon97Mke543PPIS32Ptp3iyeZy0m5WNaQsX8usgeFTBQ1hPsC5vFRikxLjAY6S78riG0WIA7RF096KUlkGT/co/YFbiONWBuPYuhLJtRIGrE1AW0ysl1h49kGDQKPPJLZb3m4xXviNqEJv3MCg1l33/MsRIMgJS4ROasqiCmHtFYcEGPCJRvU7voCOawHpCMpif9OCpKkvJ0bYzN3dgdiN8G5Ybzt2cXaek6tsbIOKr9YO5u74z6VtP2cVka4JtTJ9wBVO3U82A0DFXH1lAgMBAAECggEAMRLoEib9NGMF5tqiHqPSwuo4O3QjHCfV4Cy7r8tATcYsQRPATeBj08LnQSpqTRHWT7wZ+7zZIOyKlbXsVfWcTTJm2nJa6gWbeAC0q8Qlzf+Bes5FZlcQrq8BL/QOsnYxr4+03QtGv4gCob0v4xuwQpsL3/NokcY9+u7cYstLs4wu7kCQbnh4xSfxs9Fe5e9qn/0kd2FVeHAjeZeMeD2n/f92lDtj+JQAQb+CmzktCrxXokLgH64VCaiwiZkIBQ0tzALmf+ja0NjmiHKzDXDgAazNW4D9/s8UJrQrAlKFQeXbE1OtYSRxlt/t0a50lEvqxhKvYAwEPmQmir5HvU77jQKBgQDZOIewcmiwSRM6DY1bVg+qamUPfgzILXwdlAFBpMCWRGK1Lv79AkQZsdWxdUeRnDLJIAzEfGLKeDbVfgTNbsM6HEGONVjD1U1cIMNVCLlpxApGY9lEjuhZOBFa4NV2tGRYD97UL6CDUQGQRx7cAMrs3mqIRO8iP4KzSr4IEJ0UcwKBgQDbO5MyV0Ur9sMcPxdNJ8g0pURB6zFVjofliWJx/y9K9OnuDqjHjuZDf09CvA9GDevRYn1Um9ib58jp6b0NQNXNncUrV/Ca0uksyU/UQXhIg5eoT7ICLmCBHL5nfLADG9/hTurC3uC+fxt/qYVzKBPW3JXKHtLt5qxJORHN2WoIxwKBgCYRFw5f7mK+W6U3zMbt3Q7zWESPxXOrLO4OCu5TDgEHePjhhIQYSpDqLlXMBL/KzMecW0Bvv+xVht6BGBxcRdBANWjThnvDPKxhfXnAbqXPWjGdu+yc0rEX90qiziXgVRltppIuyoVYw9ph7FGHvggmriq1UecBlEkRVx4Ysz5rAoGBAMfkEvtEfSpvzUh08h8EVdRCl/DurEXRNnGAiYVdYlaa5qyLKzMBRUxnyPIVHGwIh2qbvaCmlKLafONinmB2LDtVThCOFzBje/289A+ZPj4H1gC94ZWBibZPagBbvPSotsHtPbo+k3a92GnXPHlaInS3HdBzuGj3+UCuS2CAiuDDAoGAXX+7Vaus4Uq3CX0jB3Dc2JbJPwMhJvs7uoTSw6hySvQWlnmhBZaEfps0K3AWXUqJZ54ecVtAd8CnRgHIHIuR7+mK1OSqsmMDY+LXY1B+mCv1lNG5UIwypAf1skOSBxFJh14ZROORodbWwCf68udv0rF5a2ilFJfB7Xz/FFGcRI4=
+      public_key : MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAugXpAWSLpr8EEfRB8Ki0CSK9WTBLV8aUGc2QoPeTgjxLgU99fBQ43Iw9AZvs+uTCtQIVaJ/ezJHueNzzyEt9j7ad4snmctJuVjWkLF/LrIHhUwUNYT7AubxUYpMS4wGOku/K4htFiAO0RdPeilJZBk/3KP2BW4jjVgbj2LoSybUSBqxNQFtMrJdYePZBg0CjzyS2W95uMV74jahCb9zAoNZd9/zLESDICUuETmrKogph7RWHBBjwiUb1O76AjmsB6QjKYn/TgqSpLydG2Mzd3YHYjfBuWG87dnF2npOrbGyDiq/WDubu+M+lbT9nFZGuCbUyfcAVTt1PNgNAxVx9ZQIDAQAB
+      expiration: 86400000
+      refresh-token:
+        expiration: 604800000

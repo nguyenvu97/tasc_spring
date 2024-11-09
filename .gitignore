@@ -1,0 +1,7 @@
+# Bỏ qua tất cả tệp .log
+*.log
+
+# Bỏ qua thư mục build/
+build/
+
+**/src/main/resources/application.yml
