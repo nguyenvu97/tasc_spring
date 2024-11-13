@@ -32,7 +32,7 @@ public class ProductDataAccessService implements ProductDao {
                 "p.product_name, " +
                 "p.product_price, " +
                 "p.product_quantity, " +
-                "p.img, " +
+                "p.url, " +
                 "p.product_description, " +
                 "p.purchase_price, " +
                 "p.product_status, " +
@@ -72,15 +72,13 @@ public class ProductDataAccessService implements ProductDao {
         String product_status = ProductStatus.OPEN.toString();
         LocalDateTime dateTime = LocalDateTime.now();
 
-
-        String sql =  "INSERT INTO product (product_id, product_name, product_description, product_price, product_quantity, path, img, purchase_price,product_status,created_at,updated_at,category_id) VALUES (UUID(), ?, ?, ?, ?, ?, ?, ?,?,?,?,?)";
+        String sql =  "INSERT INTO product (product_id, product_name, product_description, product_price, product_quantity,url, purchase_price,product_status,created_at,updated_at,category_id) VALUES (UUID(), ?, ?, ?, ?,  ?, ?,?,?,?,?)";
         return jdbcTemplate.update(sql,
                 product.getProduct_name(),
                 product.getProduct_description(),
                 product.getProduct_price(),
                 product.getProduct_quantity(),
-                product.getPath(),
-                product.getImg(),
+                product.getUrl(),
                 product.getPurchase_price(),
                 product_status,
                 dateTime.toString(),
@@ -106,7 +104,7 @@ public class ProductDataAccessService implements ProductDao {
                 "p.product_name, " +
                 "p.product_price, " +
                 "p.product_quantity, " +
-                "p.img, " +
+                "p.url, " +
                 "p.product_description, " +
                 "p.purchase_price, " +
                 "p.product_status, " +

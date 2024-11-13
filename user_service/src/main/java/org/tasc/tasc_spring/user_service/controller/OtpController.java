@@ -13,7 +13,7 @@ import org.tasc.tasc_spring.user_service.service.OtpService;
 public class OtpController {
     private final OtpService otpService;
     @PostMapping("/generate")
-    public ResponseEntity<?>generateOtp(@RequestParam String email) {
+    public ResponseEntity<?>generateOtp(@RequestParam(value = "email") String email) {
         return  ResponseEntity.ok().body(otpService.authenticateUser(email));
     }
     @PostMapping("/verify")

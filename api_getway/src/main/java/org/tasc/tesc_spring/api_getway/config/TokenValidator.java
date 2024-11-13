@@ -20,7 +20,6 @@ public class TokenValidator {
     public  String public_key ;
 
     private PublicKey getPublicKey(String key) {
-
         try {
             byte[] keyBytes = Base64.getDecoder().decode(key);
             X509EncodedKeySpec keySpec = new X509EncodedKeySpec(keyBytes);
@@ -29,13 +28,11 @@ public class TokenValidator {
         } catch (Exception e) {
             throw new RuntimeException("Failed to generate private key", e);
         }
-
     }
-
         public Claims isValidToken(String token) {
             Claims claims = Jwts
                     .parserBuilder()
-                    .setSigningKey(getPublicKey(public_key)) // Đảm bảo sử dụng khóa công khai đúng.
+                    .setSigningKey(getPublicKey(public_key))
                     .build()
                     .parseClaimsJws(token)
                     .getBody();

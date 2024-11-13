@@ -9,9 +9,10 @@ import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFac
 
 import org.springframework.stereotype.Component;
 import org.tasc.tasc_spring.api_common.ex.EntityNotFound;
+import org.tasc.tasc_spring.api_common.ex.Unauthorized;
+
 
 @Component
-
 @RequiredArgsConstructor
 public class AuthenticationFilter extends AbstractGatewayFilterFactory<AuthenticationFilter.Config> {
     private final  TokenValidator tokenValidator;
@@ -19,10 +20,13 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
     @Override
     public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {
-
             String token = exchange.getRequest().getHeaders().getFirst("Authorization");
+
+            if (token == null || token.isEmpty()) {
+                throw new Unauthorized(401, "Authorization token is missing");
+            }
             Claims claims = tokenValidator.isValidToken(token);
-            if(chain == null){
+            if(claims == null || claims.getSubject() == null) {
                 throw new EntityNotFound("Unauthorization",401);
             }
             return chain.filter(exchange);

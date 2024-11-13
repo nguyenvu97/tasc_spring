@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.tasc.tasc_spring.api_common.ex.EntityNotFound;
+//import org.tasc.tasc_spring.api_common.kafka.KafkaService;
 import org.tasc.tasc_spring.user_service.auth.AuthenticationRequest;
 import org.tasc.tasc_spring.user_service.auth.RegisterRequest;
 import org.tasc.tasc_spring.user_service.service.AuthenticationService;
@@ -23,10 +24,11 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class AuthenticationController {
     private final AuthenticationService service;
-
+//    private final KafkaService kafkaService;
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody @Valid RegisterRequest request)  {
         try{
+//            kafkaService.send_ticket(request.getEmail());
             return ResponseEntity.ok(service.register(request));
         }catch (Exception e){
             e.printStackTrace();

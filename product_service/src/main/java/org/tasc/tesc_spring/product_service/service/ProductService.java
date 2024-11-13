@@ -14,6 +14,5 @@ public interface ProductService  {
     ResponseData deleteProduct(String id);
     ResponseData selectProductById(String id);
 
-    byte[] uploadFilesImage(String fileName);
 
 }

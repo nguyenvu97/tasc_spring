@@ -23,25 +23,13 @@ public class ProductController {
     }
 
     @GetMapping("/get")
-    public ResponseEntity<?>get(@RequestParam String product_id){
+    public ResponseEntity<?>get(@RequestParam(value = "product_id") String product_id){
         return ResponseEntity.ok().body(productService.selectProductById(product_id));
     }
     @PostMapping
-    public ResponseEntity<?>add(@RequestParam String product,  @RequestParam(required = false,value = "image") List<MultipartFile> files){
+    public ResponseEntity<?>add(@RequestParam(value = "product") String product,  @RequestParam(required = false,value = "image") List<MultipartFile> files){
 
         return ResponseEntity.ok().body(productService.insertProduct(product,files));
-    }
-    @GetMapping("upload")
-    public ResponseEntity<byte[]> getImage(@RequestParam String imgName) {
-        byte[] imageBytes = productService.uploadFilesImage(imgName);
-
-        if (imageBytes != null) {
-            return ResponseEntity.ok()
-                    .contentType(MediaType.IMAGE_JPEG) // Đảm bảo định dạng chính xác
-                    .body(imageBytes);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
     }
 
     @DeleteMapping

@@ -14,7 +14,7 @@ public class ProductRowMapper implements RowMapper<ProductDto> {
                 rs.getString("product_description"),
                 rs.getDouble("product_price"),
                 rs.getInt("product_quantity"),
-                rs.getString("img"),
+                rs.getString("url"),
                 rs.getDouble("purchase_price"),
                 rs.getString("product_status"),
                 rs.getString("category_name"),

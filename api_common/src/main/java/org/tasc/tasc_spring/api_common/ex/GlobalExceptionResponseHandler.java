@@ -34,6 +34,15 @@ public class GlobalExceptionResponseHandler {
                 .build();
 
     }
+    @ExceptionHandler(value = {Unauthorized.class})
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorMessageDTO handleUnauthorized( Unauthorized e, WebRequest request) {
+        return ErrorMessageDTO.builder()
+                .message(e.getMessage())
+                .date(Instant.now())
+                .statusCode(e.getStatus_code())
+                .build();
+    }
 
 
 

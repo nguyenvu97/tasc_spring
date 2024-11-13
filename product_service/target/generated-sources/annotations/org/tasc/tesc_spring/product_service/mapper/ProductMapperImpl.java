@@ -10,7 +10,7 @@ import org.tasc.tesc_spring.product_service.model.Product;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2024-11-09T20:29:16+0700",
+    date = "2024-11-12T17:37:15+0700",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 20.0.1 (Oracle Corporation)"
 )
 @Component
@@ -31,7 +31,7 @@ public class ProductMapperImpl implements ProductMapper {
         product.product_description( productDto.getProduct_description() );
         product.product_price( productDto.getProduct_price() );
         product.product_quantity( productDto.getProduct_quantity() );
-        product.img( productDto.getImg() );
+        product.url( productDto.getUrl() );
         product.purchase_price( productDto.getPurchase_price() );
         product.product_status( productDto.getProduct_status() );
 
@@ -53,7 +53,7 @@ public class ProductMapperImpl implements ProductMapper {
         productDto.setProduct_description( product.getProduct_description() );
         productDto.setProduct_price( product.getProduct_price() );
         productDto.setProduct_quantity( product.getProduct_quantity() );
-        productDto.setImg( product.getImg() );
+        productDto.setUrl( product.getUrl() );
         productDto.setPurchase_price( product.getPurchase_price() );
         productDto.setProduct_status( product.getProduct_status() );
 

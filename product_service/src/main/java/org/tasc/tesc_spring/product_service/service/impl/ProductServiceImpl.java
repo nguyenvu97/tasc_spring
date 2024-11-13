@@ -13,12 +13,9 @@ import org.tasc.tesc_spring.product_service.dao.ProductDao;
 import org.tasc.tesc_spring.product_service.dto.request.PageDto;
 import org.tasc.tesc_spring.product_service.dto.response.ProductDto;
 import org.tasc.tesc_spring.product_service.model.Product;
+import org.tasc.tesc_spring.product_service.service.CloudinaryService;
 import org.tasc.tesc_spring.product_service.service.ProductService;
 
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -28,6 +25,7 @@ import java.util.UUID;
 public class ProductServiceImpl implements ProductService {
     private final ProductDao productDao;
     private final ConfigApp configApp;
+    private final CloudinaryService cloudinaryService;
 
     @Value("${uploading.videoSaveFolder}")
     private String FOLDER_PATH;
@@ -68,16 +66,9 @@ public class ProductServiceImpl implements ProductService {
     public ResponseData insertProduct(String product,List<MultipartFile> fileList)  {
         if (fileList != null && !fileList.isEmpty()) {
             List<String> images = new ArrayList<>();
-            String pathImg = "";
             for (MultipartFile file : fileList) {
-                String randomImageName = randomNumber();
-                 pathImg = FOLDER_PATH + "/" + randomImageName;
-                try {
-                    file.transferTo(new File(pathImg));
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                images.add(randomImageName);
+
+                images.add(  cloudinaryService.uploadFile(file));
             }
 
             String joinedImages = String.join(",", images);
@@ -88,16 +79,13 @@ public class ProductServiceImpl implements ProductService {
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
-            product1.setPath(FOLDER_PATH);
-            product1.setImg(joinedImages);
+            product1.setUrl(joinedImages);
             int data =  productDao.insertProduct(product1);
 
             if (data == 0){
                 throw new EntityNotFound("not add product",404);
             }
-
         }
-
         return ResponseData.builder()
                 .status_code(200)
                 .message("ok")
@@ -136,27 +124,7 @@ public class ProductServiceImpl implements ProductService {
                 .build();
     }
 
-    @Override
-    public byte[] uploadFilesImage(String fileName)  {
-        if (fileName == null || fileName.isEmpty()) {
-            throw new RuntimeException("File name is empty or null");
-        }
-            String images = FOLDER_PATH+ "/" + fileName;
 
-            File file = new File(images);
-
-            if (!file.exists()) {
-                throw new RuntimeException("File not found at path: " + fileName);
-            }
-
-            try {
-                return Files.readAllBytes(file.toPath());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-
-    }
 
 
 
