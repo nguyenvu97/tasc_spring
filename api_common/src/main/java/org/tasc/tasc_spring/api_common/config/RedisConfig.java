@@ -29,6 +29,6 @@ public class RedisConfig {
     }
 
     public static String Cart_Key = "cart";
-    public static String Customer_Key = "customer";
+    public static String Customer_Key = "jwt/customer";
     public static String Otp_Key = "otp";
 }

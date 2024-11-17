@@ -9,6 +9,7 @@
         <module name="user_service" />
         <module name="order_service" />
         <module name="payment_service" />
+        <module name="redis_service" />
         <module name="api_getway" />
         <module name="eureka" />
         <module name="notification_service" />
@@ -24,6 +25,7 @@
       <module name="order_service" options="" />
       <module name="payment_service" options="" />
       <module name="product_service" options="" />
+      <module name="redis_service" options="" />
       <module name="user_service" options="" />
     </option>
   </component>

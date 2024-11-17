@@ -75,8 +75,6 @@ public class StoreServiceImpl implements StoreService {
         if (customerDto == null) {
             throw  new EntityNotFound("customer not found", 404);
         }
-        
-
         return ResponseData
                 .builder()
                 .message("ok")

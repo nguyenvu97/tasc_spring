@@ -106,6 +106,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         Map<String, String> claimsMap = new HashMap<>();
         claimsMap.put(token,email);
 
+
+
         jedis.hset(Customer_Key+email,claimsMap);
         jedis.expire(Customer_Key+email,expirationTimeMillis-currentTimeMillis);
     }

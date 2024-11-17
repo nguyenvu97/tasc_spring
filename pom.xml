@@ -19,6 +19,7 @@
     <module>order_service</module>
     <module>eureka</module>
     <module>api_getway</module>
+    <module>redis_service</module>
   </modules>
 
   <properties>
