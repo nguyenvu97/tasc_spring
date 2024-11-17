@@ -10,7 +10,7 @@ import org.tasc.tesc_spring.product_service.model.Product;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2024-11-12T17:37:15+0700",
+    date = "2024-11-17T15:28:42+0700",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 20.0.1 (Oracle Corporation)"
 )
 @Component
@@ -34,6 +34,7 @@ public class ProductMapperImpl implements ProductMapper {
         product.url( productDto.getUrl() );
         product.purchase_price( productDto.getPurchase_price() );
         product.product_status( productDto.getProduct_status() );
+        product.store_id( productDto.getStore_id() );
 
         return product.build();
     }
@@ -44,20 +45,21 @@ public class ProductMapperImpl implements ProductMapper {
             return null;
         }
 
-        ProductDto productDto = new ProductDto();
+        ProductDto.ProductDtoBuilder<?, ?> productDto = ProductDto.builder();
 
         if ( product.getProduct_id() != null ) {
-            productDto.setProduct_id( product.getProduct_id().toString() );
+            productDto.product_id( product.getProduct_id().toString() );
         }
-        productDto.setProduct_name( product.getProduct_name() );
-        productDto.setProduct_description( product.getProduct_description() );
-        productDto.setProduct_price( product.getProduct_price() );
-        productDto.setProduct_quantity( product.getProduct_quantity() );
-        productDto.setUrl( product.getUrl() );
-        productDto.setPurchase_price( product.getPurchase_price() );
-        productDto.setProduct_status( product.getProduct_status() );
+        productDto.product_name( product.getProduct_name() );
+        productDto.product_description( product.getProduct_description() );
+        productDto.product_price( product.getProduct_price() );
+        productDto.product_quantity( product.getProduct_quantity() );
+        productDto.url( product.getUrl() );
+        productDto.purchase_price( product.getPurchase_price() );
+        productDto.product_status( product.getProduct_status() );
+        productDto.store_id( product.getStore_id() );
 
-        return productDto;
+        return productDto.build();
     }
 
     @Override

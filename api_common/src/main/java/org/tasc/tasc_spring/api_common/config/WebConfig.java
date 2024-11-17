@@ -1,4 +1,4 @@
-package org.tasc.tasc_spring.user_service.config;
+package org.tasc.tasc_spring.api_common.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,7 +12,7 @@ public class WebConfig  implements WebMvcConfigurer {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:4200")  // Thay thế bằng domain bạn muốn cho phép
+                        .allowedOrigins("http://localhost:5173")  // Thay thế bằng domain bạn muốn cho phép
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true);

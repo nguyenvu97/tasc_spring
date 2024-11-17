@@ -12,8 +12,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.tasc.tasc_spring.user_service.model.status.TokenType;
-import org.tasc.tasc_spring.user_service.repository.TokenRepository;
+import org.tasc.tasc_spring.api_common.model.TokenType;
 
 
 import java.io.IOException;
@@ -23,7 +22,7 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtservice;
     private final UserDetailsService userDetailsService;
-    private final TokenRepository tokenRepository;
+//    private final TokenRepository tokenRepository;
 
     @Override
     public void doFilterInternal( HttpServletRequest request,
@@ -53,7 +52,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 */
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
-            var isTokenValid = tokenRepository.findByToken(jwt).map(t -> !t.isExpired() && !t.isRevoked()).orElse(false);
+//            var isTokenValid = tokenRepository.findByToken(jwt).map(t -> !t.isExpired() && !t.isRevoked()).orElse(false);
 
             /*
             var isTokenValid = tokenRepository.findByToken(jwt) when isExpired and isRevoked == false ok
@@ -61,7 +60,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             username  = jwtservice.extractUsername(jwt) check when username != null and seciritycontextholder == null ;
              seciritycontextholder is when login ok will save  securitycontext when logout securitycontext will delete
             * */
-            if (jwtservice.isTokenValid(jwt, userDetails) && isTokenValid) {
+            if (jwtservice.isTokenValid(jwt, userDetails)) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 /*
                 userDetails save user of information ,

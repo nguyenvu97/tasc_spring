@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.tasc.tasc_spring.user_service.model.status.TokenType;
+import org.tasc.tasc_spring.api_common.model.TokenType;
 
 
 @Data

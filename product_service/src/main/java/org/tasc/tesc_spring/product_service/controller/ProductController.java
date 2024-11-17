@@ -17,9 +17,8 @@ public class ProductController {
     public final ProductService productService;
 
     @PostMapping("/get_all")
-    public ResponseEntity<?>get_all(@RequestBody(required = false) PageDto pageDto) {
-
-        return ResponseEntity.ok().body(productService.selectProduct(pageDto));
+    public ResponseEntity<?>get_all(@RequestBody(required = false) PageDto pageDto,@RequestHeader(value = "Authorization",required = false)String token) {
+        return ResponseEntity.ok().body(productService.selectProduct(pageDto,token));
     }
 
     @GetMapping("/get")
@@ -27,9 +26,11 @@ public class ProductController {
         return ResponseEntity.ok().body(productService.selectProductById(product_id));
     }
     @PostMapping
-    public ResponseEntity<?>add(@RequestParam(value = "product") String product,  @RequestParam(required = false,value = "image") List<MultipartFile> files){
+    public ResponseEntity<?>add(@RequestParam(value = "product") String product,
+                                @RequestParam(required = false,value = "image") List<MultipartFile> files,
+                                @RequestHeader(value = "Authorization" )String token){
 
-        return ResponseEntity.ok().body(productService.insertProduct(product,files));
+        return ResponseEntity.ok().body(productService.insertProduct(product,files,token));
     }
 
     @DeleteMapping

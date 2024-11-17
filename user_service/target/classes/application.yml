@@ -1,9 +1,7 @@
 spring:
   application:
-    name: user_service
-  cloud:
-    discovery:
-      enabled: true
+    name: USER_SERVICE
+
   datasource:
     url: jdbc:mysql://localhost:3300/user_service
     username: root
@@ -17,12 +15,17 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
         format_sql: true
       show_sql: true
+  cloud:
+    discovery:
+      enabled: true
+
 eureka:
   client:
-    serviceUrl:
-      defaultZone: http://localhost:8761/eureka
-    instance:
-    preferIpAddress: true
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
 server:
   port: 8083
 application:
@@ -33,3 +36,8 @@ application:
       expiration: 86400000
       refresh-token:
         expiration: 604800000
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /api-docs

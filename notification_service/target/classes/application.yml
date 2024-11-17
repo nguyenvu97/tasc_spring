@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: NOTIFICATION_SERVICE
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: nguyenkhacvu1997@gmail.com
+    password:  wfad udob rtad etme
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+  main:
+    allow-bean-definition-overriding: true
+#  kafka:
+#    bootstrap-servers: localhost:9092
+#    consumer:
+#      group-id: email_data
+#      auto-offset-reset: earliest
+#    properties:
+#      security.protocol: PLAINTEXT
+#      enable.idempotence: true
+#      request.timeout.ms: 60000
+#      max.in.flight.requests.per.connection: 5
+#    admin:
+#      properties:
+#        request.timeout.ms: 30000
+server:
+  port: 1993
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /api-docs

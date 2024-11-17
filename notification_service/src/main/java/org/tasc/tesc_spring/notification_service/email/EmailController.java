@@ -3,20 +3,16 @@ package org.tasc.tesc_spring.notification_service.email;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.tasc.tasc_spring.api_common.kafka.KafkaService;
+import org.tasc.tasc_spring.api_common.model.EmailDto;
 
-
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("api/v1/email")
-@RequiredArgsConstructor
 public class EmailController {
-    private final EmailService emailService;
-//    private final KafkaService kafkaService;
+    private final KafkaService kafkaService;
+    @PostMapping
+    public void send_email(@RequestBody EmailDto emailDto){
+        kafkaService.send_ticket(emailDto);
 
-//    @PostMapping
-//    public void sendEmail(@RequestBody EmailDto emailDto) {
-//        kafkaService.send_ticket(emailDto.getEmail());
-//    }
-
-
-
+    }
 }

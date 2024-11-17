@@ -3,7 +3,7 @@ package org.tasc.tasc_spring.user_service.oauth2.Oauth2Token;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.tasc.tasc_spring.user_service.model.status.TokenType;
+import org.tasc.tasc_spring.api_common.model.TokenType;
 
 import java.time.LocalDateTime;
 

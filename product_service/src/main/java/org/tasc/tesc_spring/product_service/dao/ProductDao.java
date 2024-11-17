@@ -7,8 +7,8 @@ import org.tasc.tesc_spring.product_service.model.Product;
 import java.util.List;
 
 public interface ProductDao {
-    List<ProductDto> selectProduct(PageDto pageDto);
-    int insertProduct(Product  product);
+    List<ProductDto> selectProduct(PageDto pageDto, String token );
+    int insertProduct(Product  product,String storeId);
     ProductDto deleteProduct(String id);
     ProductDto selectProductById(String id);
 }

@@ -1,6 +1,6 @@
 spring:
   application:
-    name: product_service
+    name: PRODUCT_SERVICE
 
   datasource:
     jdbcUrl: jdbc:mysql://localhost:3300/product_service?autoreconnect=true
@@ -8,9 +8,6 @@ spring:
     password: Vu123456
     driver-class-name: com.mysql.cj.jdbc.Driver
     maximumPoolSize: 5
-
-
-
   flyway:
     baseline-on-migrate: true
     enabled: false
@@ -29,6 +26,17 @@ uploading:
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: http://localhost:8761/eureka/
     instance:
     preferIpAddress: true
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /api-docs
+
+cloudinary:
+  api_secret: Zs2Zcw-7Pf3B6EWRiUUkV1tRYWA
+  cloud_name: dlqv9yphm
+  api_key: 655111386821477
+  folderName:  product

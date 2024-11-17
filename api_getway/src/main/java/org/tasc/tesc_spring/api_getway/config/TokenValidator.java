@@ -11,6 +11,7 @@ import java.security.KeyFactory;
 import java.security.PublicKey;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
+import java.util.function.Function;
 
 @Component
 @RequiredArgsConstructor
@@ -38,4 +39,19 @@ public class TokenValidator {
                     .getBody();
             return  claims;
     }
+    public String extractUsername(String token){return extractClaim(token ,Claims:: getSubject);  }
+
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = extractAllClaims(token);
+        return claimsResolver.apply(claims);
+    }
+    private Claims extractAllClaims(String token) {
+        return Jwts
+                .parserBuilder()
+                .setSigningKey(getPublicKey(public_key))
+                .build()
+                .parseClaimsJwt(token)
+                .getBody();
+    }
+
 }

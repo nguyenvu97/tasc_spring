@@ -23,6 +23,7 @@ public class Product {
     private String created_at;
     private String updated_at;
     private int category_id;
+    private String store_id;
 
 }
 

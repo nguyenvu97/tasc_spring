@@ -8,9 +8,8 @@ import java.util.List;
 
 public interface ProductService  {
 
-    ResponseData selectProduct(PageDto pageDto);
-    ResponseData insertProduct(String product, List<MultipartFile> fileList) ;
-
+    ResponseData selectProduct(PageDto pageDto,String token);
+    ResponseData insertProduct(String product, List<MultipartFile> fileList,String token);
     ResponseData deleteProduct(String id);
     ResponseData selectProductById(String id);
 

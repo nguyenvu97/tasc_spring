@@ -25,11 +25,4 @@ public interface ProductMapper extends MapperAll<Product, ProductDto> {
     List<ProductDto> toListDto(List<Product> e);
 
 
-//    @Mappings({
-//            @Mapping(target = "category_name",expression = "java(category_name)"),
-//            @Mapping(target = "category_description",expression = "java(description)")
-//    })
-//    ProductDto toEntity(Product product,String category_name,String description);
-
-
 }

@@ -1,4 +1,4 @@
-package org.tasc.tesc_spring.notification_service.email;
+package org.tasc.tasc_spring.api_common.model;
 
 import lombok.Data;
 
@@ -6,5 +6,5 @@ import lombok.Data;
 public class EmailDto {
     public String to;
     public String email;
-    public String body;
+    public Object body;
 }

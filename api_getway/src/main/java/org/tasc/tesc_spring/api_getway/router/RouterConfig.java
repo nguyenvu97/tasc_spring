@@ -50,34 +50,32 @@ public class RouterConfig {
             return chain.filter(ctx);
         };
     }
+
     @Bean
     public RouteLocator userRouteLocator(RouteLocatorBuilder builder) {
-        return builder
-                .routes()
-                .route("user_service_route,public",
-                        r -> r.path("/api/v1/user/login", "/api/v1/user/register", "/api/v1/otp/**")
-                                .uri("http://localhost:8083"))
-                .route("user_service_route,private",
-                        r ->r.path("/api/v1/user/decode").
-                                filters(f -> f.filter(authenticationFilter.apply(new AuthenticationFilter.Config())))
-                                .uri("http://localhost:8083"))
-
+        return builder.routes()
+                .route("user_service_route_public", r -> r.path("/api/v1/user/login", "/api/v1/user/register", "/api/v1/otp/**","/api/v1/user/logout")
+                        .uri("http://localhost:8083"))
+                .route("user_service_route_private", r -> r.path("/api/v1/user/decode")
+                        .filters(f ->
+                                f.filter(authenticationFilter.apply(new AuthenticationFilter.Config()))) // Filter authentication nếu cần
+                        .uri("http://localhost:8083"))
                 .build();
     }
     @Bean
     public RouteLocator productRouteLocator(RouteLocatorBuilder builder) {
         return builder
                 .routes()
-                .route("product_service_route,public",
-                        r -> r.path("/api/v1/product/**")
+                .route("product_service_route_public", // Sửa id ở đây
+                        r -> r.path("/api/v1/product/get_all", "/api/v1/product/get")
                                 .uri("http://localhost:1991"))
-//                .route("product_service_route,private",
-//                        r ->r.path("/api/v1/user/decode").
-//                                filters(f -> f.filter(authenticationFilter.apply(new AuthenticationFilter.Config())))
-//                                .uri("http://localhost:1991"))
-
+                .route("product_service_route_private", // Sửa id ở đây
+                        r -> r.path("/api/v1/product")
+                                .filters(f -> f.filter(authenticationFilter.apply(new AuthenticationFilter.Config())))
+                                .uri("http://localhost:1991"))
                 .build();
     }
+
 
 
 

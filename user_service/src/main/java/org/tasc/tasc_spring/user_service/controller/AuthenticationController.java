@@ -23,15 +23,15 @@ import java.io.IOException;
 @RequestMapping("/api/v1/user")
 @RequiredArgsConstructor
 public class AuthenticationController {
+//    /api/v1/user/decode
+
     private final AuthenticationService service;
-//    private final KafkaService kafkaService;
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody @Valid RegisterRequest request)  {
         try{
-//            kafkaService.send_ticket(request.getEmail());
             return ResponseEntity.ok(service.register(request));
         }catch (Exception e){
-            e.printStackTrace();
+            e.getMessage();
         }
         return ResponseEntity.badRequest().build();
 
@@ -43,8 +43,6 @@ public class AuthenticationController {
         } catch (EntityNotFound e) {
            return ResponseEntity.ok().body(e.getMessage());
         }
-
-
     }
     @PostMapping("/refresh-token")
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -57,11 +55,19 @@ public class AuthenticationController {
     @GetMapping("/decode")
     public ResponseEntity<?> decode(@RequestHeader(value = "Authorization") String token) {
         try {
-            return ResponseEntity.ok().body( service.decode_token(token));
+            return ResponseEntity.ok().body(service.decode_token(token));
         } catch (EntityNotFound e) {
             return ResponseEntity.ok().body(e.getMessage());
         }
 
+    }
+    @GetMapping("findBy")
+    public ResponseEntity<?> findBy(@RequestParam(value = "email") String email) {
+        try {
+            return ResponseEntity.ok().body(service.findByEmail(email));
+        } catch (EntityNotFound e) {
+            return ResponseEntity.ok().body(e.getMessage());
+        }
     }
 
 

@@ -8,29 +8,27 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.tasc.tasc_spring.api_common.ex.EntityNotFound;
 import org.tasc.tasc_spring.api_common.model.ResponseData;
+import org.tasc.tasc_spring.api_common.model.TokenType;
 import org.tasc.tasc_spring.user_service.auth.AuthenticationRequest;
 import org.tasc.tasc_spring.user_service.auth.AuthenticationResponse;
 import org.tasc.tasc_spring.user_service.auth.RegisterRequest;
 import org.tasc.tasc_spring.user_service.config.JwtService;
 import org.tasc.tasc_spring.user_service.config.LogoutService;
-import org.tasc.tasc_spring.user_service.dto.CustomerDto;
+import org.tasc.tasc_spring.api_common.model.CustomerDto;
 import org.tasc.tasc_spring.user_service.model.Token;
 import org.tasc.tasc_spring.user_service.model.User;
 import org.tasc.tasc_spring.user_service.model.role.Role;
-import org.tasc.tasc_spring.user_service.model.status.TokenType;
 import org.tasc.tasc_spring.user_service.repository.TokenRepository;
 import org.tasc.tasc_spring.user_service.repository.UserRepository;
 import org.tasc.tasc_spring.user_service.service.AuthenticationService;
 import redis.clients.jedis.Jedis;
 
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -63,7 +61,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .role(Role.USER)
                 .build();
         userRepository.save(user);
-
        return ResponseData
                .builder()
                .message("createOk")
@@ -74,17 +71,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 
     @Override
+//    @Transactional(rollbackOn = Exception.class)
     public ResponseData login(AuthenticationRequest request, HttpServletResponse response) throws EntityNotFound {
 
         var user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new EntityNotFound(LOGIN_FAILS.getDescription(), 200));
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-           return ResponseData
-                    .builder()
-                    .message("login failed")
-                    .status_code(200)
-                    .data(null)
-                    .build();
+           throw new EntityNotFound("user not found",404);
         }
         var jwtToken = jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
@@ -107,8 +100,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private void save_token(String token,String email){
         Claims claims = jwtService.extractToken(token);
-
-
         Date expirationTime = claims.getExpiration();
         long currentTimeMillis = System.currentTimeMillis();
         long expirationTimeMillis = expirationTime.getTime();
@@ -128,9 +119,32 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         tokenRepository.saveAll(validUserTokens);
     }
     private void saveUserToken(User user, String jwtToken) {
-        var token = Token.builder().user(user).token(jwtToken).tokenType(TokenType.BEARER).expired(false).revoked(false).build();
-        tokenRepository.save(token);
+
+        Token token = tokenRepository.findByToken(user.getUser_id()).orElse(null);
+
+        if (token != null) {
+
+            token.setUser(user);
+            token.setToken(jwtToken);
+            token.setTokenType(TokenType.BEARER);
+            token.setExpired(false);
+            token.setRevoked(false);
+            tokenRepository.save(token);
+        } else {
+         Token token1 = Token.builder()
+                    .user(user)
+                    .token(jwtToken)
+                    .tokenType(TokenType.BEARER)
+                    .expired(false)
+                    .revoked(false)
+                    .build();
+            tokenRepository.save(token1);  // Lưu token mới vào cơ sở dữ liệu
+        }
     }
+
+
+
+
     @Override
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         logoutService.logout(request,response,authentication);
@@ -141,7 +155,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     }
     @Override
-    public ResponseData decode_token(String token) throws EntityNotFound {
+    public ResponseData decode_token(String token)  {
         Claims claims = null;
         try {
             claims = jwtService.extractToken(token);
@@ -166,6 +180,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     .data(null)
                     .build();
         }
+   User user =  userRepository.findByEmail(claims.getSubject()).orElseThrow(()-> new EntityNotFound(CLIENT_NOT_FOUND.getDescription(), 400));
         return ResponseData
                 .builder()
                 .status_code(200)
@@ -173,9 +188,21 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .data(CustomerDto
                         .builder()
                         .email(claims.getSubject())
+                        .id(user.getUser_id().toString())
                         .exp(claims.getExpiration().getTime())
                         .iat(claims.getIssuedAt().getTime())
                         .build())
+                .build();
+    }
+
+    @Override
+    public ResponseData findByEmail(String email) {
+        User customer = userRepository.findByEmail(email).orElseThrow(()-> new EntityNotFound("not found",404));
+        return ResponseData
+                .builder()
+                .data(customer)
+                .message("ok")
+                .status_code(200)
                 .build();
     }
 

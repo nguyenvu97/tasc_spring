@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: api_common
+#  kafka:
+#    bootstrap-servers: localhost:9092
+#    consumer:
+#      group-id: email_data
+#      auto-offset-reset: earliest
+#    properties:
+#      security.protocol: PLAINTEXT
+#      enable.idempotence: true
+#      request.timeout.ms: 60000
+#      max.in.flight.requests.per.connection: 5
+#    admin:
+#      properties:
+#        request.timeout.ms: 30000

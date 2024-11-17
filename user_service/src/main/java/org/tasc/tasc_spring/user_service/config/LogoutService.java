@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import org.tasc.tasc_spring.user_service.repository.TokenRepository;
 import redis.clients.jedis.Jedis;
 
-import static org.tasc.tasc_spring.api_common.config.RedisConfig.Customer_Key;
+import java.util.UUID;
 
 
 @Service
@@ -22,6 +22,7 @@ public class LogoutService  implements LogoutHandler {
     private final TokenRepository tokenRepository;
     private final JwtService jwtService;
     private final Jedis jedis;
+
     @Override
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         final  String authHeader = request.getHeader("Authorization");
@@ -30,9 +31,10 @@ public class LogoutService  implements LogoutHandler {
             return;
         }
         jwt = authHeader.substring(7);
-        var storedToken = tokenRepository.findByToken(jwt).orElse(null);
+
         Claims claims = jwtService.extractToken(jwt);
-        jedis.hdel(Customer_Key+claims.getSubject());
+        var storedToken = tokenRepository.findByToken(UUID.fromString(claims.getId())).orElse(null);
+//        jedis.hdel(Customer_Key+claims.getSubject());
         if (storedToken != null){
             storedToken.setExpired(true);
             storedToken.setRevoked(true);

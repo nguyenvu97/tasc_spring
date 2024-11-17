@@ -1,25 +1,22 @@
 spring:
   application:
-    name: api_getway
+    name: API_GETWAY
   main:
     web-application-type: reactive
+    allow-bean-definition-overriding: true
   cloud:
     gateway:
-      routes:
-        - id: user_service
-          uri: http://localhost:8083
-          predicates:
-            - Path=/api/v1/user/**
-        - id: product_service
-          uri: http://localhost:1991
-          predicates:
-            - Path=/api/v1/product/**
-#        - id: StockTransaction
-#          uri: http://localhost:9094
-#          predicates:
-#            - Path=/api/v1/transaction/**
-#          filters:
-#            - name: AuthenticationFilter
+      discovery:
+        locator:
+          enabled: true
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    hostname: localhost
 server:
   port: 1990
 
@@ -27,3 +24,7 @@ application:
     security:
       jwt:
         public_key: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAugXpAWSLpr8EEfRB8Ki0CSK9WTBLV8aUGc2QoPeTgjxLgU99fBQ43Iw9AZvs+uTCtQIVaJ/ezJHueNzzyEt9j7ad4snmctJuVjWkLF/LrIHhUwUNYT7AubxUYpMS4wGOku/K4htFiAO0RdPeilJZBk/3KP2BW4jjVgbj2LoSybUSBqxNQFtMrJdYePZBg0CjzyS2W95uMV74jahCb9zAoNZd9/zLESDICUuETmrKogph7RWHBBjwiUb1O76AjmsB6QjKYn/TgqSpLydG2Mzd3YHYjfBuWG87dnF2npOrbGyDiq/WDubu+M+lbT9nFZGuCbUyfcAVTt1PNgNAxVx9ZQIDAQAB
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.cloud.netflix.eureka: DEBUG

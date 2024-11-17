@@ -24,15 +24,21 @@ public class User implements UserDetails {
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
     private UUID user_id ;
+    @Column(nullable = false)
     public String password;
+    @Column(nullable = false,unique = true)
     public String email;
+    @Column(nullable = false,unique = true)
     private String phone;
+    @Column(nullable = false)
     private String address;
+    @Column(nullable = false)
     private String fullName;
     private Role role;
     @OneToMany(mappedBy = "user")
     @JsonIgnore
     private List<Token> tokens;
+
 
 
     @Override
