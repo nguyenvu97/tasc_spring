@@ -1,14 +1,13 @@
 package org.tasc.tasc_spring.api_common.javaUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import org.tasc.tasc_spring.api_common.ex.EntityNotFound;
-import org.tasc.tasc_spring.api_common.model.CustomerDto;
-import org.tasc.tasc_spring.api_common.model.ResponseData;
+import org.tasc.tasc_spring.api_common.model.response.CustomerDto;
+import org.tasc.tasc_spring.api_common.model.response.ResponseData;
+import org.tasc.tasc_spring.api_common.user_api.UserApi;
 
 import java.util.Map;
 
-@RequiredArgsConstructor
 public class DecodeToken {
 
     public static CustomerDto decodeToken(ResponseData responseData,ObjectMapper objectMapper) {
@@ -23,5 +22,13 @@ public class DecodeToken {
         return customerDto;
     }
 
+    public static CustomerDto get_customer(String token, UserApi userApi , ObjectMapper objectMapper) {
+        ResponseData responseData =  userApi.decode(token);
+        CustomerDto customerDto  = decodeToken(responseData,objectMapper);
+        if (customerDto.getId() == null){
+            throw new EntityNotFound("token not found",404);
+        }
+        return  customerDto;
+    }
 
 }

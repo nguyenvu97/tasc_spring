@@ -31,9 +31,9 @@ public class AuthenticationController {
         try{
             return ResponseEntity.ok(service.register(request));
         }catch (Exception e){
-            e.getMessage();
+            throw e;
         }
-        return ResponseEntity.badRequest().build();
+
 
     }
     @PostMapping("/login")
@@ -41,7 +41,7 @@ public class AuthenticationController {
         try {
             return ResponseEntity.ok().body(service.login(request, response));
         } catch (EntityNotFound e) {
-           return ResponseEntity.ok().body(e.getMessage());
+            throw e;
         }
     }
     @PostMapping("/refresh-token")
@@ -57,18 +57,11 @@ public class AuthenticationController {
         try {
             return ResponseEntity.ok().body(service.decode_token(token));
         } catch (EntityNotFound e) {
-            return ResponseEntity.ok().body(e.getMessage());
+            throw e;
         }
 
     }
-    @GetMapping("findBy")
-    public ResponseEntity<?> findBy(@RequestParam(value = "email") String email) {
-        try {
-            return ResponseEntity.ok().body(service.findByEmail(email));
-        } catch (EntityNotFound e) {
-            return ResponseEntity.ok().body(e.getMessage());
-        }
-    }
+
 
 
 

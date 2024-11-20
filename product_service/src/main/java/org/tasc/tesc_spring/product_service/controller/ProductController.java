@@ -5,6 +5,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.tasc.tasc_spring.api_common.model.request.ProductRequest;
 import org.tasc.tesc_spring.product_service.dto.request.PageDto;
 import org.tasc.tesc_spring.product_service.service.ProductService;
 
@@ -25,7 +26,11 @@ public class ProductController {
     public ResponseEntity<?>get(@RequestParam(value = "product_id") String product_id){
         return ResponseEntity.ok().body(productService.selectProductById(product_id));
     }
-    @PostMapping
+    @PostMapping("/check")
+    public ResponseEntity<?>check_quantity(@RequestBody List<ProductRequest> product_id){
+        return ResponseEntity.ok().body(productService.findByProductId(product_id));
+    }
+    @PostMapping("/add")
     public ResponseEntity<?>add(@RequestParam(value = "product") String product,
                                 @RequestParam(required = false,value = "image") List<MultipartFile> files,
                                 @RequestHeader(value = "Authorization" )String token){
@@ -36,5 +41,9 @@ public class ProductController {
     @DeleteMapping
     public ResponseEntity<?>delete(@RequestParam String product_id){
         return ResponseEntity.ok().body(productService.deleteProduct(product_id));
+    }
+    @PostMapping("/update")
+    public ResponseEntity<?>update(@RequestBody List<ProductRequest> product){
+        return ResponseEntity.ok().body(productService.updateProduct(product));
     }
 }

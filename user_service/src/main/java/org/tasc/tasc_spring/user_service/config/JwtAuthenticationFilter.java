@@ -12,7 +12,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.tasc.tasc_spring.api_common.model.TokenType;
+import org.tasc.tasc_spring.api_common.model.status.TokenType;
 
 
 import java.io.IOException;

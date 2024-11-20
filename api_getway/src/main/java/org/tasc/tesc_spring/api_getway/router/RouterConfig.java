@@ -58,23 +58,28 @@ public class RouterConfig {
                         .uri("http://localhost:8083"))
                 .route("user_service_route_private", r -> r.path("/api/v1/user/decode")
                         .filters(f ->
-                                f.filter(authenticationFilter.apply(new AuthenticationFilter.Config()))) // Filter authentication nếu cần
+                                f.filter(authenticationFilter.apply(new AuthenticationFilter.Config())))
                         .uri("http://localhost:8083"))
-                .build();
-    }
-    @Bean
-    public RouteLocator productRouteLocator(RouteLocatorBuilder builder) {
-        return builder
-                .routes()
-                .route("product_service_route_public", // Sửa id ở đây
-                        r -> r.path("/api/v1/product/get_all", "/api/v1/product/get")
+                .route("product_service_route_public",
+                        r -> r.path("/api/v1/product/get_all", "/api/v1/product/get","/api/v1/product/check")
                                 .uri("http://localhost:1991"))
-                .route("product_service_route_private", // Sửa id ở đây
-                        r -> r.path("/api/v1/product")
+                .route("product_service_route_private",
+                        r -> r.path("/api/v1/product/add")
                                 .filters(f -> f.filter(authenticationFilter.apply(new AuthenticationFilter.Config())))
                                 .uri("http://localhost:1991"))
+                .route("order_service_route_private",
+                        r -> r.path("/api/v1/cart/get", "/api/v1/cart/add","/api/v1/cart/delete",
+                                        "/api/v1/order/**",
+                                        "/api/v1/order_details/**")
+                                .filters(f -> f.filter(authenticationFilter.apply(new AuthenticationFilter.Config())))
+                                .uri("http://localhost:2000"))
+                .route("pay_service_route_private",
+                        r -> r.path("/api/v1/vnpay/get")
+                                .filters(f -> f.filter(authenticationFilter.apply(new AuthenticationFilter.Config())))
+                                .uri("http://localhost:2001"))
                 .build();
     }
+
 
 
 

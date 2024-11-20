@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 
 import org.springframework.stereotype.Service;
-import org.tasc.tasc_spring.api_common.model.EmailDto;
+import org.tasc.tasc_spring.api_common.model.response.EmailDto;
 
 import static org.tasc.tasc_spring.api_common.kafka.KafkaConfig.key_email;
 

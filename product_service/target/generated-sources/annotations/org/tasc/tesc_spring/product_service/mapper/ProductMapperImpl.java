@@ -5,12 +5,12 @@ import java.util.List;
 import java.util.UUID;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
-import org.tasc.tesc_spring.product_service.dto.response.ProductDto;
+import org.tasc.tasc_spring.api_common.model.response.ProductDto;
 import org.tasc.tesc_spring.product_service.model.Product;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2024-11-17T15:28:42+0700",
+    date = "2024-11-19T09:46:15+0700",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 20.0.1 (Oracle Corporation)"
 )
 @Component

@@ -8,13 +8,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.tasc.tasc_spring.api_common.ex.EntityNotFound;
-import org.tasc.tasc_spring.api_common.model.ResponseData;
+import org.tasc.tasc_spring.api_common.ex.InvalidCallException;
+import org.tasc.tasc_spring.api_common.model.response.ResponseData;
+import org.tasc.tasc_spring.api_common.redis_api.RedisApi;
 import org.tasc.tasc_spring.user_service.dto.request.RequestOtp;
-import org.tasc.tasc_spring.user_service.model.Otp;
+import org.tasc.tasc_spring.api_common.model.Otp;
 import org.tasc.tasc_spring.user_service.model.User;
 import org.tasc.tasc_spring.user_service.repository.UserRepository;
 import org.tasc.tasc_spring.user_service.service.OtpService;
-import redis.clients.jedis.Jedis;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -23,8 +24,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Map;
+
 import static org.tasc.tasc_spring.api_common.config.RedisConfig.Otp_Key;
 
 @Service
@@ -32,8 +32,9 @@ import static org.tasc.tasc_spring.api_common.config.RedisConfig.Otp_Key;
 @RequiredArgsConstructor
 public class OtpServiceImpl implements OtpService {
     private final UserRepository userRepository;
-    private final Jedis jedis;
+    private final RedisApi redisApi;
     private final PasswordEncoder passwordEncoder;
+    private  final ObjectMapper objectMapper;
     public static String hashSHA256(String input) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -74,12 +75,7 @@ public class OtpServiceImpl implements OtpService {
         Otp otp1 = new Otp();
         otp1.setCreateAt(LocalDateTime.now().toString());
         otp1.setNumber(otp);
-        Map<String,String> map = new HashMap<>();
-        ObjectMapper objectMapper = new ObjectMapper();
-        String otpJson = objectMapper.writeValueAsString(otp1);
-        map.put(user.getEmail(), otpJson);
-        log.info(otp1.toString());
-        jedis.hset(Otp_Key,map);
+        redisApi.saveOtp(Otp_Key,user.getEmail(),otp1,2592000);
         return ResponseData
                 .builder()
                 .message("ok")
@@ -88,50 +84,42 @@ public class OtpServiceImpl implements OtpService {
                 .build();
     }
     public ResponseData verifyOTP(RequestOtp requestOtp) {
-        Map<String, String> otpData = jedis.hgetAll(Otp_Key);
-        if (otpData.containsKey(requestOtp.getEmail())){
-            String data = otpData.get(requestOtp.getEmail());
-            Otp otp1 ;
-            try {
-                ObjectMapper objectMapper = new ObjectMapper();
-                otp1 = objectMapper.readValue(data, Otp.class);
+           ResponseData responseData = redisApi.getOtp(Otp_Key,requestOtp.getEmail());
+         if (responseData.status_code == 200 && responseData.data != null) {
+             Otp otp = objectMapper.convertValue(responseData.data, Otp.class);
+                 String createAtString = otp.getCreateAt();
+                 DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+                 LocalDateTime createTotpTime = LocalDateTime.parse(createAtString, formatter);
+                 LocalDateTime currentTime = LocalDateTime.now();
+                 Duration duration = Duration.between(createTotpTime, currentTime);
+                 long minutesDifference = duration.toMinutes();
+                 if (CheckTime(minutesDifference)) {
+                     User user = userRepository.findByEmail(requestOtp.getEmail()).orElseThrow(null);
+                     GoogleAuthenticator gAuth = new GoogleAuthenticator();
+                     boolean isValid = gAuth.authorize(hashSHA256(requestOtp.getEmail()), requestOtp.getOtp());
+                     if (isValid) {
+                         user.setPassword(passwordEncoder.encode(requestOtp.getNewPassword()));
+                         userRepository.save(user);
+                         redisApi.deleteOtp(Otp_Key,requestOtp.getEmail());
+                         return ResponseData
+                                 .builder()
+                                 .data("change the password OK")
+                                 .message("ok")
+                                 .status_code(200)
+                                 .build();
+                     }
+                 }
+                 redisApi.deleteOtp(Otp_Key,requestOtp.getEmail());
+                 throw  new EntityNotFound("Expired otp code",404);
 
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-            String createAtString = otp1.getCreateAt();  // Giả sử chuỗi có dạng "2024-11-08T15:06:25.015627"
-            DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;  // Dùng định dạng chuẩn ISO
-            LocalDateTime createTotpTime = LocalDateTime.parse(createAtString, formatter);
-            LocalDateTime currentTime = LocalDateTime.now();
-            Duration duration = Duration.between(createTotpTime, currentTime);
-            long minutesDifference = duration.toMinutes();
-            if (CheckTime(minutesDifference)) {
-                User user = userRepository.findByEmail(requestOtp.getEmail()).orElseThrow(null);
-                GoogleAuthenticator gAuth = new GoogleAuthenticator();
-                boolean isValid = gAuth.authorize(hashSHA256(requestOtp.getEmail()), requestOtp.getOtp());
-                if (isValid) {
-                    user.setPassword(passwordEncoder.encode(requestOtp.getNewPassword()));
-                    userRepository.save(user);
-                    jedis.hdel(Otp_Key, requestOtp.getEmail());
-                    return ResponseData
-                            .builder()
-                            .data("change the password OK")
-                            .message("ok")
-                            .status_code(200)
-                            .build();
-                }
-            }
-            jedis.hdel(Otp_Key, requestOtp.getEmail());
-            throw  new EntityNotFound("Expired otp code",404);
-
-        }
-        throw new EntityNotFound("not found",404);
+             }
+             throw new InvalidCallException("redis service not open ",500);
+         }
 
 
 
-    }
-
-
+//
+//
     private boolean CheckTime(long time ) {
         return time <= 2;
     }

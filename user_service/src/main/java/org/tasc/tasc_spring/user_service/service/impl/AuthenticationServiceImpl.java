@@ -12,28 +12,27 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.tasc.tasc_spring.api_common.ex.EntityNotFound;
-import org.tasc.tasc_spring.api_common.model.ResponseData;
-import org.tasc.tasc_spring.api_common.model.TokenType;
+import org.tasc.tasc_spring.api_common.model.response.ResponseData;
+import org.tasc.tasc_spring.api_common.model.status.TokenType;
+import org.tasc.tasc_spring.api_common.redis_api.RedisApi;
 import org.tasc.tasc_spring.user_service.auth.AuthenticationRequest;
 import org.tasc.tasc_spring.user_service.auth.AuthenticationResponse;
 import org.tasc.tasc_spring.user_service.auth.RegisterRequest;
 import org.tasc.tasc_spring.user_service.config.JwtService;
 import org.tasc.tasc_spring.user_service.config.LogoutService;
-import org.tasc.tasc_spring.api_common.model.CustomerDto;
+import org.tasc.tasc_spring.api_common.model.response.CustomerDto;
 import org.tasc.tasc_spring.user_service.model.Token;
 import org.tasc.tasc_spring.user_service.model.User;
 import org.tasc.tasc_spring.user_service.model.role.Role;
 import org.tasc.tasc_spring.user_service.repository.TokenRepository;
 import org.tasc.tasc_spring.user_service.repository.UserRepository;
 import org.tasc.tasc_spring.user_service.service.AuthenticationService;
-import redis.clients.jedis.Jedis;
-
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.tasc.tasc_spring.api_common.config.RedisConfig.Customer_Key;
+import static org.tasc.tasc_spring.api_common.config.RedisConfig.Token_Key;
 import static org.tasc.tasc_spring.api_common.ex.ExceptionMessagesEnum.CLIENT_NOT_FOUND;
 import static org.tasc.tasc_spring.api_common.ex.ExceptionMessagesEnum.LOGIN_FAILS;
 
@@ -48,7 +47,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final TokenRepository tokenRepository;
     private final LogoutService logoutService;
-    private final Jedis jedis;
+    private final RedisApi redisApi;
     @Override
     public ResponseData register(RegisterRequest request) {
         User user = User
@@ -75,7 +74,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public ResponseData login(AuthenticationRequest request, HttpServletResponse response) throws EntityNotFound {
 
         var user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new EntityNotFound(LOGIN_FAILS.getDescription(), 200));
+                .orElseThrow(() -> new EntityNotFound(LOGIN_FAILS.getDescription(), 400));
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
            throw new EntityNotFound("user not found",404);
         }
@@ -100,16 +99,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private void save_token(String token,String email){
         Claims claims = jwtService.extractToken(token);
-        Date expirationTime = claims.getExpiration();
-        long currentTimeMillis = System.currentTimeMillis();
-        long expirationTimeMillis = expirationTime.getTime();
+        redisApi.saveToken(Token_Key,claims.getSubject(),token,2592000);
+
         Map<String, String> claimsMap = new HashMap<>();
         claimsMap.put(token,email);
 
 
 
-        jedis.hset(Customer_Key+email,claimsMap);
-        jedis.expire(Customer_Key+email,expirationTimeMillis-currentTimeMillis);
     }
     private void revokeAllUserTokens(User user) {
         var validUserTokens = tokenRepository.findAllValidTokenByUser(user.getUser_id());
@@ -125,7 +121,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         Token token = tokenRepository.findByToken(user.getUser_id()).orElse(null);
 
         if (token != null) {
-
             token.setUser(user);
             token.setToken(jwtToken);
             token.setTokenType(TokenType.BEARER);
@@ -197,15 +192,5 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .build();
     }
 
-    @Override
-    public ResponseData findByEmail(String email) {
-        User customer = userRepository.findByEmail(email).orElseThrow(()-> new EntityNotFound("not found",404));
-        return ResponseData
-                .builder()
-                .data(customer)
-                .message("ok")
-                .status_code(200)
-                .build();
-    }
 
 }

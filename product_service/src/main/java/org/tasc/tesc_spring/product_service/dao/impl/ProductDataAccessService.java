@@ -9,9 +9,9 @@ import org.springframework.stereotype.Component;
 import org.tasc.tasc_spring.api_common.ex.EntityNotFound;
 import org.tasc.tesc_spring.product_service.dao.ProductDao;
 import org.tasc.tesc_spring.product_service.dto.request.PageDto;
-import org.tasc.tesc_spring.product_service.dto.response.ProductDto;
+import org.tasc.tasc_spring.api_common.model.response.ProductDto;
 import org.tasc.tesc_spring.product_service.model.Product;
-import org.tasc.tesc_spring.product_service.model.ProductStatus;
+import org.tasc.tasc_spring.api_common.model.status.ProductStatus;
 import org.tasc.tesc_spring.product_service.rowmapper.GenericRowMapper;
 
 import java.time.LocalDateTime;
@@ -124,6 +124,12 @@ public class ProductDataAccessService implements ProductDao {
 
         RowMapper<ProductDto> rowMapper = new GenericRowMapper<>(ProductDto.class);
         return jdbcTemplate.query(sql, rowMapper, id).stream().findFirst().orElseThrow(() -> new EntityNotFound("not found",404));
+    }
+
+    @Override
+    public int updateProduct(String productId, int quantity) {
+        String sql = "update product set product_quantity = ? where product_id = ?";
+        return jdbcTemplate.update(sql,quantity,productId);
     }
 
 }

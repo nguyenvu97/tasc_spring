@@ -1,11 +1,9 @@
 package org.tasc.tesc_spring.product_service.mapper;
 
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Mappings;
 import org.tasc.tasc_spring.api_common.mapper.MapperAll;
 import org.tasc.tasc_spring.api_common.mapper.MapperConfig;
-import org.tasc.tesc_spring.product_service.dto.response.ProductDto;
+import org.tasc.tasc_spring.api_common.model.response.ProductDto;
 import org.tasc.tesc_spring.product_service.model.Product;
 
 import java.util.List;

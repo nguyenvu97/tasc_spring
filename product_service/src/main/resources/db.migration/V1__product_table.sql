@@ -11,7 +11,9 @@ CREATE TABLE IF NOT EXISTS product (
     created_at varchar(255) not null,
     updated_at varchar(255) not null,
     category_id decimal not null,
-    store_id    varchar(255) not null
+    store_id  varchar(255) not null
+
+
 );
 
 

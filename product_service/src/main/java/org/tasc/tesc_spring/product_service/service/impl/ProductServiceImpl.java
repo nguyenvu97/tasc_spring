@@ -1,6 +1,5 @@
 package org.tasc.tesc_spring.product_service.service.impl;
 
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -8,22 +7,21 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.tasc.tasc_spring.api_common.ex.EntityNotFound;
-import org.tasc.tasc_spring.api_common.model.CustomerDto;
-import org.tasc.tasc_spring.api_common.model.ResponseData;
+import org.tasc.tasc_spring.api_common.model.request.ProductRequest;
+import org.tasc.tasc_spring.api_common.model.response.CustomerDto;
+import org.tasc.tasc_spring.api_common.model.response.ResponseData;
+import org.tasc.tasc_spring.api_common.model.status.ProductStatus;
 import org.tasc.tasc_spring.api_common.user_api.UserApi;
 import org.tasc.tesc_spring.product_service.config.ConfigApp;
 import org.tasc.tesc_spring.product_service.dao.ProductDao;
 import org.tasc.tesc_spring.product_service.dto.request.PageDto;
-import org.tasc.tesc_spring.product_service.dto.response.ProductDto;
+import org.tasc.tasc_spring.api_common.model.response.ProductDto;
 import org.tasc.tesc_spring.product_service.model.Product;
 import org.tasc.tesc_spring.product_service.service.CloudinaryService;
 import org.tasc.tesc_spring.product_service.service.ProductService;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -97,7 +95,6 @@ public class ProductServiceImpl implements ProductService {
                 throw  new EntityNotFound("token ex",401);
             }
 
-
                 CustomerDto customerDto = null;
                if (responseData.data instanceof Map){
                    Map<String, Object> dataMap = (Map<String, Object>) responseData.data;
@@ -151,8 +148,52 @@ public class ProductServiceImpl implements ProductService {
                 .build();
     }
 
+    @Override
+    public ResponseData findByProductId(List<ProductRequest> productRequests) {
+        List<ProductDto> availableProducts = new ArrayList<>();
+        List<ProductDto> outOfStockProducts = new ArrayList<>();
+
+        for (ProductRequest productRequest : productRequests) {
+            ProductDto productDto = productDao.selectProductById(productRequest.getProductId());
+
+            if (ProductStatus.OPEN.toString().equals(productDto.getProduct_status()) && productDto.getProduct_quantity() >= productRequest.getQuantity()) {
+                availableProducts.add(productDto);
+            } else {
+                outOfStockProducts.add(productDto);
+            }
+        }
+
+        if (availableProducts.isEmpty() && outOfStockProducts.isEmpty()) {
+            return ResponseData.builder()
+                    .status_code(404)
+                    .message("No products found or all products are out of stock")
+                    .build();
+        }
 
 
+        return ResponseData.builder()
+                .status_code(200)
+                .message("Products")
+                .data(new HashMap<String, List<ProductDto>>() {{
+                    put("available", availableProducts);
+                    put("outOfStock", outOfStockProducts);
+                }})
+                .build();
+    }
+
+    @Override
+    public ResponseData updateProduct(List<ProductRequest> productRequests) {
+        productRequests.stream().forEach(productRequest -> {
+          ProductDto product =  productDao.selectProductById(productRequest.getProductId());
+             productDao.updateProduct(productRequest.getProductId(),product.getProduct_quantity() - productRequest.getQuantity());
+        });
+        return ResponseData
+                .builder()
+                .message("updateOk")
+                .status_code(200)
+                .data("Ok")
+                .build();
+    }
 
 
 }

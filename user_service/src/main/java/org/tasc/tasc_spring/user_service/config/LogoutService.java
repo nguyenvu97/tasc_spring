@@ -9,10 +9,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.stereotype.Service;
+import org.tasc.tasc_spring.api_common.redis_api.RedisApi;
 import org.tasc.tasc_spring.user_service.repository.TokenRepository;
-import redis.clients.jedis.Jedis;
 
 import java.util.UUID;
+
+import static org.tasc.tasc_spring.api_common.config.RedisConfig.Token_Key;
 
 
 @Service
@@ -21,7 +23,7 @@ import java.util.UUID;
 public class LogoutService  implements LogoutHandler {
     private final TokenRepository tokenRepository;
     private final JwtService jwtService;
-    private final Jedis jedis;
+    private final RedisApi redisApi;
 
     @Override
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
@@ -34,7 +36,7 @@ public class LogoutService  implements LogoutHandler {
 
         Claims claims = jwtService.extractToken(jwt);
         var storedToken = tokenRepository.findByToken(UUID.fromString(claims.getId())).orElse(null);
-//        jedis.hdel(Customer_Key+claims.getSubject());
+        redisApi.delete(Token_Key,claims.getSubject());
         if (storedToken != null){
             storedToken.setExpired(true);
             storedToken.setRevoked(true);

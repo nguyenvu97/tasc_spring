@@ -3,7 +3,7 @@ package org.tasc.tesc_spring.notification_service.email;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.tasc.tasc_spring.api_common.kafka.KafkaService;
-import org.tasc.tasc_spring.api_common.model.EmailDto;
+import org.tasc.tasc_spring.api_common.model.response.EmailDto;
 
 @RequiredArgsConstructor
 @RestController
