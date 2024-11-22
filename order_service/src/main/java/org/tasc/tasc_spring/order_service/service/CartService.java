@@ -9,4 +9,6 @@ public interface CartService {
     ResponseData addCart(ProductDto cart, String token);
     ResponseData getCart(String token);
     ResponseData deleteCart(List<String> product_id, String token);
+    int countCart(String token);
+    void sendNotification(String token);
 }

@@ -19,5 +19,7 @@ public class CustomerDto implements Serializable {
     public long exp;
     @JsonProperty("iat")
     public long iat;
+    @JsonProperty("role")
+    private String role;
 
 }

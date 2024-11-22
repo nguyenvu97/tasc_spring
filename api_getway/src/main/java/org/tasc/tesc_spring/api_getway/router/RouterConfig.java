@@ -2,6 +2,7 @@ package org.tasc.tesc_spring.api_getway.router;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
@@ -16,6 +17,7 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import org.tasc.tesc_spring.api_getway.config.AuthenticationFilter;
+import org.tasc.tesc_spring.api_getway.config.TokenValidator;
 import reactor.core.publisher.Mono;
 
 
@@ -23,7 +25,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class RouterConfig {
     private final AuthenticationFilter authenticationFilter;
-
+    private final TokenValidator tokenValidator;
 
 
     private static final String ALLOWED_HEADERS = "x-requested-with, authorization, Content-Type, Authorization, credential, X-XSRF-TOKEN";
@@ -61,12 +63,15 @@ public class RouterConfig {
                                 f.filter(authenticationFilter.apply(new AuthenticationFilter.Config())))
                         .uri("http://localhost:8083"))
                 .route("product_service_route_public",
-                        r -> r.path("/api/v1/product/get_all", "/api/v1/product/get","/api/v1/product/check")
+                        r -> r.path("/api/v1/product/get_all", "/api/v1/product/get")
                                 .uri("http://localhost:1991"))
                 .route("product_service_route_private",
-                        r -> r.path("/api/v1/product/add")
+                        r -> r.path("/api/v1/product/add","/api/v1/product/update","/api/v1/product/check")
                                 .filters(f -> f.filter(authenticationFilter.apply(new AuthenticationFilter.Config())))
                                 .uri("http://localhost:1991"))
+                .route("order_service_route_public", r -> r
+                        .path("/gs-guide-websocket")
+                        .uri("ws://localhost:1990"))
                 .route("order_service_route_private",
                         r -> r.path("/api/v1/cart/get", "/api/v1/cart/add","/api/v1/cart/delete",
                                         "/api/v1/order/**",

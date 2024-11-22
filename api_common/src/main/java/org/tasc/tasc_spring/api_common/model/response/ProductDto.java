@@ -9,7 +9,7 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@SuperBuilder
+@Builder
 public class ProductDto  implements Serializable {
     private String product_id;
     private String product_name;

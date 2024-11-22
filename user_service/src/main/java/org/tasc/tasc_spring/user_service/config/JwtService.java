@@ -72,6 +72,7 @@ public class JwtService {
 
     private String buildToken(Map<String, Object> extraClaims, UserDetails userDetails, Long expiration)  {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(()-> new EntityNotFound("not found",401));
+        extraClaims.put("role", user.getRole());
         return Jwts.builder()
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())

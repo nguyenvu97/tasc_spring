@@ -1,4 +1,4 @@
-package org.tasc.tasc_spring.payment_service.vnpay;
+package org.tasc.tasc_spring.payment_service.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

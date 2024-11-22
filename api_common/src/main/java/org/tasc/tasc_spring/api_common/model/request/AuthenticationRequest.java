@@ -1,4 +1,4 @@
-package org.tasc.tasc_spring.user_service.auth;
+package org.tasc.tasc_spring.api_common.model.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

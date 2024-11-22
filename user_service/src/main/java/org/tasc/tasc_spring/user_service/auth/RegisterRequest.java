@@ -1,10 +1,12 @@
 package org.tasc.tasc_spring.user_service.auth;
 
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.tasc.tasc_spring.user_service.model.role.Role;
 
 @Data
 @Builder
@@ -21,4 +23,6 @@ public class RegisterRequest {
     private String address;
     @NotEmpty(message = "Thiếu name")
     private String fullName;
+    @NotNull(message = "Thiếu Role")
+    private Role role;
 }

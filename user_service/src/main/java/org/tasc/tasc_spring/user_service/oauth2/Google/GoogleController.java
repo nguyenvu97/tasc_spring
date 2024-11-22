@@ -17,7 +17,7 @@
 //import org.tasc.tasc_spring.user_service.oauth2.Oauth2Repository;
 //import org.tasc.tasc_spring.user_service.oauth2.Oauth2Token.Oauth2Token;
 //import org.tasc.tasc_spring.user_service.oauth2.Oauth2Token.Oauth2TokenRepository;
-//import org.tasc.tasc_spring.user_service.auth.AuthenticationResponse;
+//import org.tasc.tasc_spring.api_common.model.response.AuthenticationResponse;
 //import org.tasc.tasc_spring.user_service.model.status.TokenType;
 //
 //import java.io.IOException;

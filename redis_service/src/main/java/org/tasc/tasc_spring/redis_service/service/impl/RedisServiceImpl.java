@@ -92,6 +92,23 @@ public class RedisServiceImpl  implements RedisService {
                 .build();
     }
 
+    @Override
+    public ResponseData countCart(String key, String user_id) {
+        List<Cart> data = (List<Cart>) get_data_redis(key, user_id,redisTemplate);
+        if (data == null || data.isEmpty()) {
+            return ResponseData.builder()
+                    .status_code(404)
+                    .message("not found")
+                    .data("") // If data is not null, retrieve from Redis
+                    .build();
+        }
+        return ResponseData
+                .builder()
+                .data(data.size())
+                .status_code(200)
+                .message("ok")
+                .build();
+    }
 
 
     @Override

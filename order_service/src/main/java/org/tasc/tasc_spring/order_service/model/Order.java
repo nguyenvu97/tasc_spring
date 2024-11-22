@@ -1,6 +1,7 @@
 package org.tasc.tasc_spring.order_service.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.annotation.PostConstruct;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
@@ -31,4 +32,9 @@ public class Order {
     private LocalDateTime update_at;
     @OneToMany(mappedBy = "order",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private List<OrderDetails> orderDetailsList;
+    @PostConstruct
+    public void init() {
+        create_at = LocalDateTime.now();
+        update_at = LocalDateTime.now();
+    }
 }

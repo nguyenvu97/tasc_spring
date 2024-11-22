@@ -1,10 +1,13 @@
 package org.tasc.tesc_spring.product_service.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ServerWebExchange;
+import org.tasc.tasc_spring.api_common.ex.EntityNotFound;
 import org.tasc.tasc_spring.api_common.model.request.ProductRequest;
 import org.tasc.tesc_spring.product_service.dto.request.PageDto;
 import org.tasc.tesc_spring.product_service.service.ProductService;
@@ -43,7 +46,13 @@ public class ProductController {
         return ResponseEntity.ok().body(productService.deleteProduct(product_id));
     }
     @PostMapping("/update")
-    public ResponseEntity<?>update(@RequestBody List<ProductRequest> product){
-        return ResponseEntity.ok().body(productService.updateProduct(product));
+    public ResponseEntity<?> update(@RequestBody List<ProductRequest> productRequests,
+                                    @RequestHeader(value = "Authorization") String token) {
+
+        try{
+            return ResponseEntity.ok().body(productService.updateProduct(productRequests, token));
+        } catch (EntityNotFound e){
+           throw e;
+        }
     }
 }

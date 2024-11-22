@@ -12,10 +12,14 @@ import org.tasc.tasc_spring.api_common.ex.EntityNotFound;
 import org.tasc.tasc_spring.api_common.ex.Unauthorized;
 
 
-@Component
 @RequiredArgsConstructor
+@Component
 public class AuthenticationFilter extends AbstractGatewayFilterFactory<AuthenticationFilter.Config> {
-    private final  TokenValidator tokenValidator;
+    private final   TokenValidator tokenValidator;
+
+
+
+
 
     @Override
     public GatewayFilter apply(Config config) {
@@ -29,6 +33,10 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
             if(claims == null || claims.getSubject() == null) {
                 throw new EntityNotFound("Unauthorization",401);
             }
+            String userRole = claims.get("role", String.class);
+            exchange = exchange.mutate()
+                    .request(r -> r.header("role",userRole))
+                    .build();
             return chain.filter(exchange);
         };
     }

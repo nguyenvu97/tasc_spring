@@ -6,7 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.security.core.Authentication;
 import org.tasc.tasc_spring.api_common.model.response.ResponseData;
-import org.tasc.tasc_spring.user_service.auth.AuthenticationRequest;
+import org.tasc.tasc_spring.api_common.model.request.AuthenticationRequest;
 import org.tasc.tasc_spring.user_service.auth.RegisterRequest;
 
 

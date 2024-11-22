@@ -11,7 +11,7 @@ import org.tasc.tasc_spring.order_service.model.Order;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2024-11-20T09:06:14+0700",
+    date = "2024-11-21T20:03:00+0700",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 20.0.1 (Oracle Corporation)"
 )
 @Component

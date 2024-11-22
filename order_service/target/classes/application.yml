@@ -19,6 +19,9 @@ spring:
     cloud:
         discovery:
           enabled: true
+admin:
+  username: nguyenvu123
+  password: 123456789
 
 eureka:
   client:

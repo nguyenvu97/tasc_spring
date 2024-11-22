@@ -23,6 +23,8 @@ public interface RedisApi {
     ResponseData get(@RequestParam(value = "key") String key,@RequestParam(value = "user_id")String user_id);
     @GetMapping()
     ResponseData delete (@RequestParam(value = "product_id") List<String> product_id,@RequestParam("user_id") String user_id, @RequestParam(value = "key") String key);
+    @GetMapping("/count")
+    ResponseData count(@RequestParam(value = "key") String key,@RequestParam(value = "user_id")String user_id);
 
     // token
     @PostMapping("/token/save")

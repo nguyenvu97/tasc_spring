@@ -5,13 +5,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.tasc.tasc_spring.api_common.ex.EntityNotFound;
 //import org.tasc.tasc_spring.api_common.kafka.KafkaService;
-import org.tasc.tasc_spring.user_service.auth.AuthenticationRequest;
+import org.tasc.tasc_spring.api_common.model.request.AuthenticationRequest;
 import org.tasc.tasc_spring.user_service.auth.RegisterRequest;
 import org.tasc.tasc_spring.user_service.service.AuthenticationService;
 

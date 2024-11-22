@@ -1,10 +1,15 @@
 package org.tasc.tasc_spring.order_service.service.impl;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.tasc.tasc_spring.api_common.ex.EntityNotFound;
+import org.tasc.tasc_spring.api_common.model.request.AuthenticationRequest;
 import org.tasc.tasc_spring.api_common.model.request.ProductRequest;
+import org.tasc.tasc_spring.api_common.model.response.AuthenticationResponse;
 import org.tasc.tasc_spring.api_common.model.response.CustomerDto;
 import org.tasc.tasc_spring.api_common.model.response.ProductDto;
 import org.tasc.tasc_spring.api_common.model.response.ResponseData;
@@ -22,10 +27,10 @@ import org.tasc.tasc_spring.order_service.service.OrderDetailsService;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-import com.fasterxml.jackson.core.type.TypeReference;
 
 import static java.util.stream.Collectors.toList;
 import static org.tasc.tasc_spring.api_common.config.RedisConfig.Cart_Key;
+import static org.tasc.tasc_spring.api_common.javaUtils.DecodeToken.decodeToken;
 import static org.tasc.tasc_spring.api_common.javaUtils.DecodeToken.get_customer;
 
 @Service
@@ -38,7 +43,10 @@ public class OrderDetailsServiceImpl implements OrderDetailsService {
     private final ProductApi productApi;
     private final RedisApi redisApi;
     private final OrderMapper orderMapper;
-
+    @Value("${admin.username}")
+    private String adminUsername;
+    @Value("${admin.password}")
+    private String adminPassword;
 
     private String orderNo(){
         UUID uuid = UUID.randomUUID();
@@ -85,11 +93,19 @@ public class OrderDetailsServiceImpl implements OrderDetailsService {
     }
 
     private List<ProductDto> checkProductQuantity(List<ProductRequest>products){
-        ResponseData responseData = productApi.find_product(products);
-        if (responseData.status_code == 200 && responseData.data != null){
-            Map<String, List<ProductDto>> data = objectMapper.convertValue(responseData.data, new TypeReference<Map<String, List<ProductDto>>>(){});
-            List<ProductDto> availableProducts = data.get("available");
-            return availableProducts;
+
+        AuthenticationRequest authenticationRequest = new AuthenticationRequest(adminUsername, adminPassword);
+
+
+
+
+            ResponseData responseData = productApi.find_product(products);
+            if (responseData.status_code == 200 && responseData.data != null) {
+                Map<String, List<ProductDto>> data = objectMapper.convertValue(responseData.data, new TypeReference<Map<String, List<ProductDto>>>() {
+                });
+                List<ProductDto> availableProducts = data.get("available");
+                return availableProducts;
+
 
         }
         return null;

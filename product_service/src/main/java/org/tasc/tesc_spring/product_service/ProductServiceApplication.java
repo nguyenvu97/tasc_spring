@@ -14,7 +14,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
         basePackages ="org.tasc.tasc_spring.api_common"
 )
 @EnableDiscoveryClient
-public class ProductServiceApplication {
+public class    ProductServiceApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(ProductServiceApplication.class, args);

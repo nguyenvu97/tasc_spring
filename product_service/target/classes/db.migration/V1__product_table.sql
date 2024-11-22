@@ -8,8 +8,8 @@ CREATE TABLE IF NOT EXISTS product (
     url TEXT,
     purchase_price decimal NOT NULL,
     product_status varchar(50) not null,
-    created_at varchar(255) not null,
-    updated_at varchar(255) not null,
+    created_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL,
     category_id decimal not null,
     store_id  varchar(255) not null
 

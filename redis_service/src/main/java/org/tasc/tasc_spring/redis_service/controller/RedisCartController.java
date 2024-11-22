@@ -33,5 +33,9 @@ public class RedisCartController {
 
         return ResponseEntity.ok().body( redisService.getInRedis(key,user_id));
     }
+    @GetMapping("count")
+    public ResponseEntity<?> count(@RequestParam(value = "key") String key,@RequestParam(value = "user_id")String user_id) {
+        return ResponseEntity.ok().body( redisService.countCart(key,user_id));
+    }
 }
 

@@ -2,14 +2,17 @@ package org.tasc.tesc_spring.product_service.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ServerWebExchange;
 import org.tasc.tasc_spring.api_common.ex.EntityNotFound;
 import org.tasc.tasc_spring.api_common.model.request.ProductRequest;
 import org.tasc.tasc_spring.api_common.model.response.CustomerDto;
 import org.tasc.tasc_spring.api_common.model.response.ResponseData;
+
 import org.tasc.tasc_spring.api_common.model.status.ProductStatus;
 import org.tasc.tasc_spring.api_common.user_api.UserApi;
 import org.tasc.tesc_spring.product_service.config.ConfigApp;
@@ -21,7 +24,9 @@ import org.tasc.tesc_spring.product_service.service.CloudinaryService;
 import org.tasc.tesc_spring.product_service.service.ProductService;
 
 import java.util.*;
-import java.util.stream.Collectors;
+
+import static org.tasc.tasc_spring.api_common.javaUtils.DecodeToken.get_customer;
+import static org.tasc.tasc_spring.api_common.javaUtils.DecodeToken.performAction;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +35,7 @@ public class ProductServiceImpl implements ProductService {
     private final ConfigApp configApp;
     private final CloudinaryService cloudinaryService;
     private final UserApi userApi;
+    private final ObjectMapper objectMapper;
 
 
     @Value("${uploading.videoSaveFolder}")
@@ -38,7 +44,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ResponseData selectProduct(PageDto pageDto,String token) {
 
-            if (pageDto.getPageNo() <=0 || pageDto.getPageSize() <= 0) {
+            if (pageDto.getPageNo() <0 || pageDto.getPageSize() <= 0) {
                 pageDto.setPageSize(configApp.pageSize);
                 pageDto.setPageNo(configApp.pageNumber);
             }
@@ -182,16 +188,51 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ResponseData updateProduct(List<ProductRequest> productRequests) {
-        productRequests.stream().forEach(productRequest -> {
-          ProductDto product =  productDao.selectProductById(productRequest.getProductId());
-             productDao.updateProduct(productRequest.getProductId(),product.getProduct_quantity() - productRequest.getQuantity());
-        });
-        return ResponseData
-                .builder()
-                .message("updateOk")
+    public ResponseData updateProduct(List<ProductRequest> productRequests, String token) {
+        CustomerDto customerDto = get_customer(token, userApi, objectMapper);
+        if (customerDto.getRole() == null || "USER".equals(customerDto.getRole())) {
+            return ResponseData.builder()
+                    .message("Unauthorized: insufficient permissions.")
+                    .status_code(401)
+                    .data("bad")
+                    .build();
+        }
+
+        for (ProductRequest productRequest : productRequests) {
+            ProductDto product = productDao.selectProductById(productRequest.getProductId());
+
+            if (product == null) {
+                return ResponseData.builder()
+                        .message("Product not found with ID: " + productRequest.getProductId())
+                        .status_code(404)
+                        .data("Product not found")
+                        .build();
+            }
+            if (productRequest.getQuantity() < 0) {
+                return ResponseData.builder()
+                        .message("Invalid quantity for product ID: " + productRequest.getProductId())
+                        .status_code(400)
+                        .data("bad request")
+                        .build();
+            }
+
+            int newQuantity = product.getProduct_quantity() - productRequest.getQuantity();
+            if (newQuantity < 0) {
+                return ResponseData.builder()
+                        .message("Insufficient stock for product ID: " + productRequest.getProductId())
+                        .status_code(400)
+                        .data("insufficient stock")
+                        .build();
+            }
+
+
+            productDao.updateProduct(productRequest.getProductId(), newQuantity);
+        }
+
+        return ResponseData.builder()
+                .message("Products updated successfully.")
                 .status_code(200)
-                .data("Ok")
+                .data("OK")
                 .build();
     }
 

@@ -15,20 +15,18 @@ import org.tasc.tasc_spring.api_common.ex.EntityNotFound;
 import org.tasc.tasc_spring.api_common.model.response.ResponseData;
 import org.tasc.tasc_spring.api_common.model.status.TokenType;
 import org.tasc.tasc_spring.api_common.redis_api.RedisApi;
-import org.tasc.tasc_spring.user_service.auth.AuthenticationRequest;
-import org.tasc.tasc_spring.user_service.auth.AuthenticationResponse;
+import org.tasc.tasc_spring.api_common.model.request.AuthenticationRequest;
+import org.tasc.tasc_spring.api_common.model.response.AuthenticationResponse;
 import org.tasc.tasc_spring.user_service.auth.RegisterRequest;
 import org.tasc.tasc_spring.user_service.config.JwtService;
 import org.tasc.tasc_spring.user_service.config.LogoutService;
 import org.tasc.tasc_spring.api_common.model.response.CustomerDto;
 import org.tasc.tasc_spring.user_service.model.Token;
 import org.tasc.tasc_spring.user_service.model.User;
-import org.tasc.tasc_spring.user_service.model.role.Role;
 import org.tasc.tasc_spring.user_service.repository.TokenRepository;
 import org.tasc.tasc_spring.user_service.repository.UserRepository;
 import org.tasc.tasc_spring.user_service.service.AuthenticationService;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -57,7 +55,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .phone(request.getPhone())
                 .fullName(request.getFullName())
-                .role(Role.USER)
+                .role(request.getRole())
                 .build();
         userRepository.save(user);
        return ResponseData
@@ -100,12 +98,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private void save_token(String token,String email){
         Claims claims = jwtService.extractToken(token);
         redisApi.saveToken(Token_Key,claims.getSubject(),token,2592000);
-
         Map<String, String> claimsMap = new HashMap<>();
         claimsMap.put(token,email);
-
-
-
     }
     private void revokeAllUserTokens(User user) {
         var validUserTokens = tokenRepository.findAllValidTokenByUser(user.getUser_id());
@@ -184,6 +178,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .message("OK")
                 .data(CustomerDto
                         .builder()
+                        .role(claims.get("role", String.class))
                         .email(claims.getSubject())
                         .id(user.getUser_id().toString())
                         .exp(claims.getExpiration().getTime())

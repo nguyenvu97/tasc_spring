@@ -34,6 +34,7 @@ public class User implements UserDetails {
     private String address;
     @Column(nullable = false)
     private String fullName;
+    @Enumerated(EnumType.STRING)
     private Role role;
     @OneToMany(mappedBy = "user")
     @JsonIgnore
@@ -43,7 +44,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return getAuthorities();
     }
 
     @Override

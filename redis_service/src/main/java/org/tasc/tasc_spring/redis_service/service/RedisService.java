@@ -11,5 +11,5 @@ public interface RedisService {
     ResponseData getInRedis(String key,String user_id);
     ResponseData deleteProduct(List<String> product_id, String key, String user_id);
     ResponseData totalQuantity  (String key,String user_id,String product_id,int quantity);
-
+    ResponseData countCart(String key,String user_id);
 }
