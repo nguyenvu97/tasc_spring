@@ -23,10 +23,12 @@ public class Transaction {
     private String method;
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
+    private String requestId;
     private String orderNo;
     private String userId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
 
    @PostConstruct
     public void init() {

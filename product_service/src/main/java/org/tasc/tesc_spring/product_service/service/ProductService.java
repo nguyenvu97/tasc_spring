@@ -15,8 +15,8 @@ public interface ProductService  {
     ResponseData insertProduct(String product, List<MultipartFile> fileList,String token);
     ResponseData deleteProduct(String id);
     ResponseData selectProductById(String id);
-    ResponseData findByProductId(List<ProductRequest>productId);
-    ResponseData updateProduct(List<ProductRequest>productRequests,String token);
+    ResponseData findByProductId(List<ProductRequest>productId,String token , HttpServletRequest request);
+    ResponseData updateProduct(List<ProductRequest>productRequests, String token, HttpServletRequest request);
 
 
 }

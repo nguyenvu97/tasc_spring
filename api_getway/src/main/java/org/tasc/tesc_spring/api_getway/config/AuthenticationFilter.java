@@ -7,9 +7,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ServerWebExchange;
 import org.tasc.tasc_spring.api_common.ex.EntityNotFound;
-import org.tasc.tasc_spring.api_common.ex.Unauthorized;
+import org.tasc.tasc_spring.api_common.model.response.ResponseData;
+import reactor.core.publisher.Mono;
+
+import java.nio.charset.StandardCharsets;
 
 
 @RequiredArgsConstructor
@@ -25,20 +33,37 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
     public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {
             String token = exchange.getRequest().getHeaders().getFirst("Authorization");
-
+            Claims claims = null;
             if (token == null || token.isEmpty()) {
-                throw new Unauthorized(401, "Authorization token is missing");
+                return sendUnauthorizedResponse(exchange,"Authorization token is missing");
             }
-            Claims claims = tokenValidator.isValidToken(token);
-            if(claims == null || claims.getSubject() == null) {
-                throw new EntityNotFound("Unauthorization",401);
-            }
-            String userRole = claims.get("role", String.class);
-            exchange = exchange.mutate()
-                    .request(r -> r.header("role",userRole))
-                    .build();
-            return chain.filter(exchange);
+                 claims = tokenValidator.isValidToken(token);
+                if(claims == null || claims.getSubject() == null) {
+                    return sendUnauthorizedResponse(exchange,"Invalid token");
+                }
+            ServerHttpRequest.Builder requestBuilder = exchange.getRequest().mutate();
+            claims.forEach((key, value) -> {
+                if (value != null) {
+                    requestBuilder.header(key, value.toString());
+                }
+            });
+            ServerHttpRequest modifiedRequest = requestBuilder.build();
+            System.out.println(modifiedRequest);
+
+            return chain.filter(exchange.mutate().request(modifiedRequest).build());
         };
+    }
+    private Mono<Void> sendUnauthorizedResponse(ServerWebExchange exchange, String message ) {
+        // Tạo phản hồi với mã 401 (Unauthorized)
+        exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+        exchange.getResponse().getHeaders().setContentType(MediaType.APPLICATION_JSON);
+
+        // Tạo thông điệp lỗi dạng JSON
+        String responseMessage = "{\"message\": \"" + message + "\", \"status\": 401}";
+
+        // Gửi phản hồi với nội dung JSON
+        DataBuffer buffer = exchange.getResponse().bufferFactory().wrap(responseMessage.getBytes(StandardCharsets.UTF_8));
+        return exchange.getResponse().writeWith(Mono.just(buffer));
     }
 
     public static class Config {

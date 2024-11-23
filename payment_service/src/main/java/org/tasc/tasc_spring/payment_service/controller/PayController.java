@@ -1,6 +1,7 @@
 package org.tasc.tasc_spring.payment_service.controller;
 
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -39,9 +40,9 @@ Mật khẩu OTP	123456
 * */
 
     @GetMapping("/get")
-    public ResponseEntity<?> hashUrl(@RequestParam(value = "orderNo") String orderNo, @RequestHeader(value = "Authorization") String token) {
+    public ResponseEntity<?> hashUrl(@RequestParam(value = "orderNo") String orderNo, @RequestHeader(value = "Authorization") String token, HttpServletRequest request) {
         try{
-            return ResponseEntity.ok().body(payService.hashUrl(orderNo, token));
+            return ResponseEntity.ok().body(payService.hashUrl(orderNo, token,request));
         }catch (EntityNotFound e){
             throw e;
         }

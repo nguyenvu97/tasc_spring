@@ -10,7 +10,7 @@ import org.tasc.tesc_spring.product_service.model.Product;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2024-11-19T09:46:15+0700",
+    date = "2024-11-23T22:28:21+0700",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 20.0.1 (Oracle Corporation)"
 )
 @Component
@@ -45,7 +45,7 @@ public class ProductMapperImpl implements ProductMapper {
             return null;
         }
 
-        ProductDto.ProductDtoBuilder<?, ?> productDto = ProductDto.builder();
+        ProductDto.ProductDtoBuilder productDto = ProductDto.builder();
 
         if ( product.getProduct_id() != null ) {
             productDto.product_id( product.getProduct_id().toString() );

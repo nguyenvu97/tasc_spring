@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.tasc.tasc_spring.api_common.ex.EntityNotFound;
 
 import java.security.KeyFactory;
 import java.security.PublicKey;
@@ -31,26 +32,17 @@ public class TokenValidator {
         }
     }
         public Claims isValidToken(String token) {
-            Claims claims = Jwts
+            Claims  claims = Jwts
                     .parserBuilder()
                     .setSigningKey(getPublicKey(public_key))
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
-            return  claims;
+            return claims;
+
+
     }
 
-    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = extractAllClaims(token);
-        return claimsResolver.apply(claims);
-    }
-    private Claims extractAllClaims(String token) {
-        return Jwts
-                .parserBuilder()
-                .setSigningKey(getPublicKey(public_key))
-                .build()
-                .parseClaimsJwt(token)
-                .getBody();
-    }
+
 
 }

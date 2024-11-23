@@ -30,8 +30,8 @@ public class ProductController {
         return ResponseEntity.ok().body(productService.selectProductById(product_id));
     }
     @PostMapping("/check")
-    public ResponseEntity<?>check_quantity(@RequestBody List<ProductRequest> product_id){
-        return ResponseEntity.ok().body(productService.findByProductId(product_id));
+    public ResponseEntity<?>check_quantity(@RequestBody List<ProductRequest> product_id,@RequestHeader("Authorization")String token ,HttpServletRequest httpServletRequest){
+        return ResponseEntity.ok().body(productService.findByProductId(product_id,token,httpServletRequest));
     }
     @PostMapping("/add")
     public ResponseEntity<?>add(@RequestParam(value = "product") String product,
@@ -47,10 +47,10 @@ public class ProductController {
     }
     @PostMapping("/update")
     public ResponseEntity<?> update(@RequestBody List<ProductRequest> productRequests,
-                                    @RequestHeader(value = "Authorization") String token) {
+                                    @RequestHeader(value = "Authorization") String token,HttpServletRequest request) {
 
         try{
-            return ResponseEntity.ok().body(productService.updateProduct(productRequests, token));
+            return ResponseEntity.ok().body(productService.updateProduct(productRequests, token, request));
         } catch (EntityNotFound e){
            throw e;
         }

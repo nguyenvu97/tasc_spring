@@ -26,11 +26,7 @@ public class Product {
     private LocalDateTime updated_at;
     private int category_id;
     private String store_id;
-    @PostConstruct
-    public void init() {
-        created_at = LocalDateTime.now();
-        updated_at = LocalDateTime.now();
-    }
+
 
 }
 

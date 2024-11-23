@@ -38,9 +38,6 @@ public class ProductServiceImpl implements ProductService {
     private final ObjectMapper objectMapper;
 
 
-    @Value("${uploading.videoSaveFolder}")
-    private String FOLDER_PATH;
-
     @Override
     public ResponseData selectProduct(PageDto pageDto,String token) {
 
@@ -155,21 +152,25 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ResponseData findByProductId(List<ProductRequest> productRequests) {
-        List<ProductDto> availableProducts = new ArrayList<>();
-        List<ProductDto> outOfStockProducts = new ArrayList<>();
+    public ResponseData findByProductId(List<ProductRequest> productRequests,String token , HttpServletRequest request) {
+        String data = request.getHeader("role");
+        if (data == null || "USER".equals(data)) {
+            return ResponseData.builder()
+                    .message("Unauthorized: insufficient permissions.")
+                    .status_code(401)
+                    .data("bad")
+                    .build();
+        }
 
+        List<ProductDto> availableProducts = new ArrayList<>();
         for (ProductRequest productRequest : productRequests) {
             ProductDto productDto = productDao.selectProductById(productRequest.getProductId());
 
-            if (ProductStatus.OPEN.toString().equals(productDto.getProduct_status()) && productDto.getProduct_quantity() >= productRequest.getQuantity()) {
+            if (ProductStatus.OPEN.toString().equals(productDto.getProduct_status()) && productDto.getProduct_quantity() >= productRequest.getQuantity() && productDto.getProduct_quantity() >0) {
                 availableProducts.add(productDto);
-            } else {
-                outOfStockProducts.add(productDto);
             }
         }
-
-        if (availableProducts.isEmpty() && outOfStockProducts.isEmpty()) {
+        if (availableProducts.isEmpty() ) {
             return ResponseData.builder()
                     .status_code(404)
                     .message("No products found or all products are out of stock")
@@ -180,17 +181,15 @@ public class ProductServiceImpl implements ProductService {
         return ResponseData.builder()
                 .status_code(200)
                 .message("Products")
-                .data(new HashMap<String, List<ProductDto>>() {{
-                    put("available", availableProducts);
-                    put("outOfStock", outOfStockProducts);
-                }})
+                .data(availableProducts)
                 .build();
     }
 
     @Override
-    public ResponseData updateProduct(List<ProductRequest> productRequests, String token) {
-        CustomerDto customerDto = get_customer(token, userApi, objectMapper);
-        if (customerDto.getRole() == null || "USER".equals(customerDto.getRole())) {
+    public ResponseData updateProduct(List<ProductRequest> productRequests, String token,HttpServletRequest request) {
+        String data = request.getHeader("role");
+
+        if (data == null || "USER".equals(data)) {
             return ResponseData.builder()
                     .message("Unauthorized: insufficient permissions.")
                     .status_code(401)

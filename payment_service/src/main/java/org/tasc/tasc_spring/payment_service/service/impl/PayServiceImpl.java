@@ -2,6 +2,7 @@ package org.tasc.tasc_spring.payment_service.service.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -45,7 +46,7 @@ public class PayServiceImpl implements PayService {
     private String adminPassword;
 
     @Override
-    public ResponseData hashUrl(String orderNo, String token) {
+    public ResponseData hashUrl(String orderNo, String token,HttpServletRequest request)  {
         CustomerDto customerDto = get_customer(token,userApi,objectMapper);
         if (customerDto.getId() == null || customerDto.getId().isEmpty()) {
             throw  new EntityNotFound("token not found",404);
@@ -113,6 +114,7 @@ public class PayServiceImpl implements PayService {
                     .orderNo(orderNo)
                     .userId(customerDto.getId())
                     .amount(amount)
+                    .requestId(request.getRequestId())
                     .createdAt(LocalDateTime.now())
                     .build());
 

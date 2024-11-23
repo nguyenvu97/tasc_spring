@@ -57,13 +57,21 @@ public class OrderDetailsServiceImpl implements OrderDetailsService {
     @Transactional(rollbackOn = Exception.class)
     public ResponseData createOrderDetails(List<ProductRequest> products, String token, boolean choose) {
 
-        CustomerDto customerDto = get_customer(token, userApi, objectMapper);
+
 
         double total = 0.0;
         Order order;
        Map<String,Integer> map = products.stream().collect(Collectors.toMap(ProductRequest::getProductId, ProductRequest::getQuantity));
         List<OrderDetails> orderDetailsList = new ArrayList<>();
         List<ProductDto> productDtos = checkProductQuantity(products);
+        if (productDtos == null || productDtos.isEmpty()){
+            ResponseData
+                    .builder()
+                    .message("product not found")
+                    .status_code(404)
+                    .data("")
+                    .build();
+        }
         for (ProductDto productRequest : productDtos) {
             OrderDetails orderDetails = convert(productRequest);
                  Integer quantity  = map.get(productRequest.getProduct_id());
@@ -72,7 +80,7 @@ public class OrderDetailsServiceImpl implements OrderDetailsService {
 
             orderDetailsList.add(orderDetails);
         }
-
+        CustomerDto customerDto = get_customer(token, userApi, objectMapper);
         order = createOrder(total, orderNo(), customerDto.getId());
 
         order = orderRepository.save(order);
@@ -95,16 +103,17 @@ public class OrderDetailsServiceImpl implements OrderDetailsService {
     private List<ProductDto> checkProductQuantity(List<ProductRequest>products){
 
         AuthenticationRequest authenticationRequest = new AuthenticationRequest(adminUsername, adminPassword);
+        ResponseData customer = userApi.authenticate(authenticationRequest);
+        ResponseData responseData = null;
+        if (customer.status_code == 200 && customer.data != null){
+            AuthenticationResponse res = objectMapper.convertValue(customer.data, new TypeReference<AuthenticationResponse>() {});
+             responseData = productApi.find_product(products,res.getAccessToken());
+        }
 
-
-
-
-            ResponseData responseData = productApi.find_product(products);
             if (responseData.status_code == 200 && responseData.data != null) {
-                Map<String, List<ProductDto>> data = objectMapper.convertValue(responseData.data, new TypeReference<Map<String, List<ProductDto>>>() {
+                 List<ProductDto> data = objectMapper.convertValue(responseData.data, new TypeReference< List<ProductDto>>() {
                 });
-                List<ProductDto> availableProducts = data.get("available");
-                return availableProducts;
+                return data;
 
 
         }
