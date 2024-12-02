@@ -129,8 +129,29 @@ public class ProductDataAccessService implements ProductDao {
 
     @Override
     public int updateProduct(String productId, int quantity) {
-        String sql = "update product set product_quantity = ? where product_id = ?";
-        return jdbcTemplate.update(sql,quantity,productId);
+        LocalDateTime localDateTime = LocalDateTime.now();
+        String sql = "update product set product_quantity = ?,updated_at = ? where product_id = ?";
+        return jdbcTemplate.update(sql,quantity,localDateTime,productId);
+    }
+
+    @Override
+    public List<ProductDto> getAllProducts(boolean choose) {
+        StringBuilder sql = new StringBuilder();
+        List<Object> params = new ArrayList<>();
+        if (choose) {
+            sql.append("select * from product where product_status = ? ");
+            params.add(ProductStatus.OPEN.toString());
+        }else {
+            LocalDateTime localDateTime = LocalDateTime.now();
+            sql.append("select * from product where product_status = ? and updated_at <= ");
+            params.add(ProductStatus.OPEN.toString());
+            LocalDateTime oneMinuteAgo = localDateTime.minusMinutes(1).minusSeconds(30);
+            params.add(oneMinuteAgo);
+        }
+
+
+        RowMapper<ProductDto> rowMapper = new GenericRowMapper<>(ProductDto.class);
+        return jdbcTemplate.query(sql.toString(),rowMapper,params.toArray());
     }
 
 }

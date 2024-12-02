@@ -30,6 +30,10 @@ public class Order {
     private OrderStatus statusOrder;
     private LocalDateTime create_at;
     private LocalDateTime update_at;
+    private String fullName;
+    private String userId;
+    private String address;
+    private String phone;
     @OneToMany(mappedBy = "order",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private List<OrderDetails> orderDetailsList;
     @PostConstruct

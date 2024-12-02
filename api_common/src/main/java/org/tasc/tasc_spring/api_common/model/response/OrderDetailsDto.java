@@ -5,12 +5,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 
+import java.io.Serializable;
 import java.util.UUID;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class OrderDetailsDto {
+public class OrderDetailsDto implements Serializable {
     private String order_details_id;
     private String productId;
     private double price;

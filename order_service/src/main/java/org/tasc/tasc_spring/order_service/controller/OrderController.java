@@ -1,11 +1,14 @@
 package org.tasc.tasc_spring.order_service.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.tasc.tasc_spring.api_common.ex.EntityNotFound;
 import org.tasc.tasc_spring.api_common.model.request.ProductRequest;
+import org.tasc.tasc_spring.api_common.model.response.CustomerDto;
 import org.tasc.tasc_spring.api_common.model.response.OrderDto;
+import org.tasc.tasc_spring.order_service.dto.UserDto;
 import org.tasc.tasc_spring.order_service.service.OrderDetailsService;
 import org.tasc.tasc_spring.order_service.service.OrderService;
 
@@ -34,13 +37,21 @@ public class OrderController {
         }
 
     }
-    @PostMapping
-    public ResponseEntity<?>create(@RequestParam(value = "choose") int choose,@RequestParam(value = "orderNo") String orderNo){
+    @PostMapping("update")
+    public ResponseEntity<?>update(@RequestParam(value = "choose") int choose,@RequestParam(value = "orderNo") String orderNo){
         try{
-            return ResponseEntity.ok().body(orderService.createOrder(choose,orderNo));
+            return ResponseEntity.ok().body(orderService.update(choose,orderNo));
         }catch (EntityNotFound e){
             throw e;
         }
 
+    }
+    @PostMapping("create")
+    public ResponseEntity<?>create(@RequestHeader(value = "Authorization") String token, @RequestBody UserDto userDto, HttpServletRequest request,@RequestParam(value = "orderNo") String orderNo){
+        try{
+            return ResponseEntity.ok().body(orderService.createOrder(orderNo,userDto,token,request));
+        }catch (EntityNotFound e){
+            throw e;
+        }
     }
 }

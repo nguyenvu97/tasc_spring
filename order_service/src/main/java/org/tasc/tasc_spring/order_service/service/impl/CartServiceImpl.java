@@ -37,8 +37,7 @@ public class CartServiceImpl implements CartService {
   @Override
   public ResponseData addCart(ProductDto cart, String token) {
     CustomerDto customerDto = get_customer(token,userApi,objectMapper);
-
-    Cart cart1 = cartMapper.toDto(cart,customerDto.getId());
+    Cart cart1 = cartMapper.toDto(cart);
     cart1.setProduct_quantity(1);
     ResponseData responseData =  redisApi.save(Cart_Key,customerDto.getId(),cart1,2592000);
     if (responseData.status_code ==200){

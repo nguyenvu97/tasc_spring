@@ -20,6 +20,7 @@ import static org.tasc.tasc_spring.api_common.kafka.KafkaConfig.key_email;
 public class KafkaConsumerService {
     private final ObjectMapper objectMapper;
     private final EmailSender emailSender;
+
 @KafkaListener(topics = key_email, groupId = consumer)
 public void test_data_kafka(ConsumerRecord<String, String> record) {
     try {

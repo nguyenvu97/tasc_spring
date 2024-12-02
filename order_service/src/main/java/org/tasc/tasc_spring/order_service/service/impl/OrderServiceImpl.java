@@ -1,12 +1,14 @@
 package org.tasc.tasc_spring.order_service.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.tasc.tasc_spring.api_common.ex.EntityNotFound;
 import org.tasc.tasc_spring.api_common.model.response.OrderDto;
 import org.tasc.tasc_spring.api_common.model.response.ResponseData;
 import org.tasc.tasc_spring.api_common.model.status.OrderStatus;
+import org.tasc.tasc_spring.order_service.dto.UserDto;
 import org.tasc.tasc_spring.order_service.mapper.OrderMapper;
 import org.tasc.tasc_spring.order_service.model.Order;
 import org.tasc.tasc_spring.order_service.repository.OrderRepository;
@@ -40,7 +42,29 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public ResponseData createOrder(int choose, String orderNo) {
+    public ResponseData createOrder(String orderNo, UserDto userDto, String token, HttpServletRequest request) {
+        String userId = request.getHeader("jti");
+        System.out.println(orderNo);
+        Order order = orderRepository.getOrderByNo(orderNo);
+        if(order == null) {
+            throw new EntityNotFound("order not found",404);
+        }
+        order.setUserId(userId);
+        order.setAddress(userDto.getAddress());
+        order.setFullName(userDto.getFullName());
+        order.setPhone(userDto.getPhone());
+        orderRepository.save(order);
+        return ResponseData
+                .builder()
+                .message("ok")
+                .data("create Order Ok")
+                .status_code(200)
+                .build();
+
+    }
+
+    @Override
+    public ResponseData update(int choose, String orderNo) {
 
         Order order = orderRepository.getOrderByNo(orderNo);
         if (order == null) {

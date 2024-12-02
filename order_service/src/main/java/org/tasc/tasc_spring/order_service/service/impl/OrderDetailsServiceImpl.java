@@ -56,9 +56,6 @@ public class OrderDetailsServiceImpl implements OrderDetailsService {
     @Override
     @Transactional(rollbackOn = Exception.class)
     public ResponseData createOrderDetails(List<ProductRequest> products, String token, boolean choose) {
-
-
-
         double total = 0.0;
         Order order;
        Map<String,Integer> map = products.stream().collect(Collectors.toMap(ProductRequest::getProductId, ProductRequest::getQuantity));
@@ -93,10 +90,14 @@ public class OrderDetailsServiceImpl implements OrderDetailsService {
                     .collect(toList());
             redisApi.delete(productIds, customerDto.getId(), Cart_Key);
         }
+        orderDetailsRepository.saveAll(orderDetailsList);
+        order.setOrderDetailsList(orderDetailsList);
+
         return ResponseData
                 .builder()
                 .message("Success")
-                .data(orderDetailsRepository.saveAll(orderDetailsList))
+                .status_code(200)
+                .data(orderMapper.toEntity(order))
                 .build();
     }
 
@@ -130,6 +131,7 @@ public class OrderDetailsServiceImpl implements OrderDetailsService {
         orderDetails.setImg(productDto.getUrl());
         orderDetails.setStoreId(productDto.getStore_id());
         orderDetails.setProductId(productDto.getProduct_id());
+
         return orderDetails;
     }
 
@@ -139,7 +141,7 @@ public class OrderDetailsServiceImpl implements OrderDetailsService {
         order.setOrderNo(orderNo);
         order.setTotalPrice(total);
         order.setStatusOrder(OrderStatus.PENDING);
-        order.setOrderId(UUID.fromString(customerId));
+        order.setUserId(customerId);
         order.setCreate_at(LocalDateTime.now());
         order.setUpdate_at(LocalDateTime.now());
         return order;

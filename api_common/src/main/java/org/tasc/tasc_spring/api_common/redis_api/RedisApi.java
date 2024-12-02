@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.tasc.tasc_spring.api_common.model.Otp;
 import org.tasc.tasc_spring.api_common.model.request.Cart;
+import org.tasc.tasc_spring.api_common.model.response.ProductDto;
 import org.tasc.tasc_spring.api_common.model.response.ResponseData;
 
 import java.util.List;
@@ -41,5 +42,18 @@ public interface RedisApi {
     ResponseData getOtp(@RequestParam(value = "key") String key,@RequestParam(value = "user_id")String user_id);
     @GetMapping("otp/delete")
     ResponseData deleteOtp ( @RequestParam(value = "key") String key,@RequestParam("user_id") String user_id);
+
+    //product
+    @PostMapping("product/save")
+    ResponseData saveProduct(@RequestParam(value = "key") String key, @RequestBody List<ProductDto> productDtoList);
+    @PostMapping("product/update")
+    ResponseData updateProduct(@RequestParam(value = "key") String key,@RequestBody List<ProductDto> productDtoList);
+    @GetMapping("product/delete")
+    ResponseData deleteProduct( @RequestParam(value = "key") String key);
+    @GetMapping("get")
+    ResponseData getProduct(@RequestParam(value = "key") String key,@RequestParam(value = "page",required = false) int page, @RequestParam(value = "size",required = false)int size);
+
+
+
 
 }

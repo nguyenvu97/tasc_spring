@@ -105,7 +105,7 @@ public class PayServiceImpl implements PayService {
             }
         }
         if (transactionService.countTransaction(orderNo) >=1) {
-            throw new EntityNotFound("transaction has create",404);
+            throw new EntityNotFound("transaction has update",404);
         }
             ResponseData responseData1 = transactionService.createTransaction(Transaction
                     .builder()
@@ -136,11 +136,12 @@ public class PayServiceImpl implements PayService {
     @Override
     public String Transaction(long amount, String BankCode, String OrderInfo, String responseCode, String vnp_TxnRef, String vnp_TransactionNo) {
         ResultDto storeDto = new ResultDto();
+
         if (responseCode.equals("00")) {
             storeDto.setStatus("ok");
             storeDto.setMessenger("thanh cong");
 
-            ResponseData responseData = order_api.create(1,OrderInfo);
+            ResponseData responseData = order_api.update(1,OrderInfo);
             if (responseData.status_code == 200 && responseData.message.equals("SUCCESS")) {
                 OrderDto orderDto = objectMapper.convertValue(responseData.data, OrderDto.class);
                 List<ProductRequest> productRequests = new ArrayList<>();
@@ -152,7 +153,6 @@ public class PayServiceImpl implements PayService {
                                 .build())
 
                 );
-
                 AuthenticationRequest authenticationRequest = new AuthenticationRequest(adminUsername,adminPassword);
                 ResponseData res1= userApi.authenticate(authenticationRequest);
                 if (res1.status_code == 200 && res1.data != null) {
@@ -163,9 +163,10 @@ public class PayServiceImpl implements PayService {
                         if (rs.status_code != 200) {
                             throw new EntityNotFound("save not transaction  ",404);
                         }
-                        System.out.println("send email");
+
+
                     }else {
-                        ResponseData responseData2 = order_api.create(4,OrderInfo);
+                        ResponseData responseData2 = order_api.update(4,OrderInfo);
                         if (responseData2.status_code == 200){
                             throw new EntityNotFound("Quantity not available",404);
                         }
@@ -181,7 +182,7 @@ public class PayServiceImpl implements PayService {
             }
             return generateHtmlResponse("Thanh Toán Thành Công","Cảm Ơn Bạn Thanh Toán !");
         }
-        ResponseData responseData2 = order_api.create(2,OrderInfo);
+        ResponseData responseData2 = order_api.update(2,OrderInfo);
         if (responseData2.status_code == 200){
             throw new EntityNotFound("Quantity not available",404);
         }
@@ -207,11 +208,25 @@ public class PayServiceImpl implements PayService {
                 "        h1 {\n" +
                 "            color: #008000;\n" +
                 "        }\n" +
+                "        button {\n" +
+                "            background-color: #4CAF50;\n" +
+                "            color: white;\n" +
+                "            padding: 10px 20px;\n" +
+                "            border: none;\n" +
+                "            border-radius: 5px;\n" +
+                "            font-size: 16px;\n" +
+                "            cursor: pointer;\n" +
+                "        }\n" +
+                "        button:hover {\n" +
+                "            background-color: #45a049;\n" +
+                "        }\n" +
                 "    </style>\n" +
                 "</head>\n" +
                 "<body>\n" +
                 "    <h1>" + title + "</h1>\n" +
                 "    <p>" + message + "</p>\n" +
+                "    <!-- Button to redirect to localhost:5731 -->\n" +
+                "    <button onclick=\"window.location.href='http://localhost:5173';\">Go to home</button>\n" +
                 "</body>\n" +
                 "</html>\n";
     }

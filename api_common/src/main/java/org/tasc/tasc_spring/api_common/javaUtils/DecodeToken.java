@@ -32,7 +32,6 @@ public class DecodeToken {
         if (customerDto.getId() == null){
             throw new EntityNotFound("token not found",404);
         }
-
         return  customerDto;
     }
     public static String performAction(HttpServletRequest request) {

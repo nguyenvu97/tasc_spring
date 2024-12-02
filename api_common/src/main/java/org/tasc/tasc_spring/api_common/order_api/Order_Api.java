@@ -11,6 +11,7 @@ import org.tasc.tasc_spring.api_common.model.response.ResponseData;
 public interface Order_Api {
     @GetMapping
     ResponseData getOrderNo(@RequestParam(value = "orderNo") String orderNo);
-    @PostMapping
-    ResponseData create(@RequestParam(value = "choose") int choose,@RequestParam(value = "orderNo") String orderNo);
+    @PostMapping("update")
+    ResponseData update(@RequestParam(value = "choose") int choose,@RequestParam(value = "orderNo") String orderNo);
+
 }

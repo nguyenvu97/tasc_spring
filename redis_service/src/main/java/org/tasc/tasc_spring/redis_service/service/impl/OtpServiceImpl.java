@@ -11,6 +11,7 @@ import org.tasc.tasc_spring.redis_service.service.OtpService;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static org.tasc.tasc_spring.redis_service.javaUtils.Utils.check_key;
 import static org.tasc.tasc_spring.redis_service.javaUtils.Utils.get_data_redis;
 
 @Service
@@ -31,6 +32,14 @@ public class OtpServiceImpl implements OtpService {
 
     @Override
     public ResponseData getInRedis(String key, String user_id) {
+        if (!check_key(key)){
+            ResponseData
+                    .builder()
+                    .message("key not exist")
+                    .status_code(404)
+                    .data("ok")
+                    .build();
+        }
         Otp otp = (Otp) get_data_redis(key, user_id,redisTemplate);
         return ResponseData
                 .builder()
@@ -42,6 +51,14 @@ public class OtpServiceImpl implements OtpService {
 
     @Override
     public ResponseData deleteProduct( String key, String user_id) {
+        if (!check_key(key)){
+            ResponseData
+                    .builder()
+                    .message("key not exist")
+                    .status_code(404)
+                    .data("ok")
+                    .build();
+        }
         redisTemplate.opsForHash().delete(key,user_id);
         return ResponseData
                 .builder()

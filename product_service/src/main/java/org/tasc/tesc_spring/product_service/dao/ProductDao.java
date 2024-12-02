@@ -12,4 +12,6 @@ public interface ProductDao {
     ProductDto deleteProduct(String id);
     ProductDto selectProductById(String id);
     int updateProduct(String productId, int quantity);
+    List<ProductDto>getAllProducts(boolean choose);
+
 }

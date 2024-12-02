@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -37,6 +38,7 @@ import static org.tasc.tasc_spring.api_common.ex.ExceptionMessagesEnum.LOGIN_FAI
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class AuthenticationServiceImpl implements AuthenticationService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -82,6 +84,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         save_token(jwtToken,request.getEmail());
         revokeAllUserTokens(user);
         saveUserToken(user, refreshToken);
+        log.info("Fetching user details for userId: {}", jwtToken);
         return ResponseData
                 .builder()
                 .message("loginOk")
@@ -171,16 +174,19 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     .data(null)
                     .build();
         }
-   User user =  userRepository.findByEmail(claims.getSubject()).orElseThrow(()-> new EntityNotFound(CLIENT_NOT_FOUND.getDescription(), 400));
+//   User user =  userRepository.findByEmail(claims.getSubject()).orElseThrow(()-> new EntityNotFound(CLIENT_NOT_FOUND.getDescription(), 400));
         return ResponseData
                 .builder()
                 .status_code(200)
                 .message("OK")
                 .data(CustomerDto
                         .builder()
-                        .role(claims.get("role", String.class))
+                        .fullName((String) claims.get("fullName")) // Ép kiểu trực tiếp
+                        .address((String) claims.get("address")) // Ép kiểu trực tiếp
+                        .phone((String) claims.get("phone")) // Ép kiểu trực tiếp
+                        .role((String) claims.get("role"))
                         .email(claims.getSubject())
-                        .id(user.getUser_id().toString())
+                        .id(claims.getId())
                         .exp(claims.getExpiration().getTime())
                         .iat(claims.getIssuedAt().getTime())
                         .build())

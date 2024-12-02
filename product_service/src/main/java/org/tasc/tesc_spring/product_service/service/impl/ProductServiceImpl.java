@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ServerWebExchange;
@@ -14,17 +15,20 @@ import org.tasc.tasc_spring.api_common.model.response.CustomerDto;
 import org.tasc.tasc_spring.api_common.model.response.ResponseData;
 
 import org.tasc.tasc_spring.api_common.model.status.ProductStatus;
+import org.tasc.tasc_spring.api_common.redis_api.RedisApi;
 import org.tasc.tasc_spring.api_common.user_api.UserApi;
 import org.tasc.tesc_spring.product_service.config.ConfigApp;
 import org.tasc.tesc_spring.product_service.dao.ProductDao;
 import org.tasc.tesc_spring.product_service.dto.request.PageDto;
 import org.tasc.tasc_spring.api_common.model.response.ProductDto;
+import org.tasc.tesc_spring.product_service.mapper.ProductMapper;
 import org.tasc.tesc_spring.product_service.model.Product;
 import org.tasc.tesc_spring.product_service.service.CloudinaryService;
 import org.tasc.tesc_spring.product_service.service.ProductService;
 
 import java.util.*;
 
+import static org.tasc.tasc_spring.api_common.config.RedisConfig.Product_Key_Map;
 import static org.tasc.tasc_spring.api_common.javaUtils.DecodeToken.get_customer;
 import static org.tasc.tasc_spring.api_common.javaUtils.DecodeToken.performAction;
 
@@ -35,16 +39,15 @@ public class ProductServiceImpl implements ProductService {
     private final ConfigApp configApp;
     private final CloudinaryService cloudinaryService;
     private final UserApi userApi;
-    private final ObjectMapper objectMapper;
+    private final RedisApi redisApi;
 
 
     @Override
     public ResponseData selectProduct(PageDto pageDto,String token) {
-
-            if (pageDto.getPageNo() <0 || pageDto.getPageSize() <= 0) {
+        if (pageDto.getPageNo() <0 || pageDto.getPageSize() <= 0) {
                 pageDto.setPageSize(configApp.pageSize);
                 pageDto.setPageNo(configApp.pageNumber);
-            }
+        }
         if (pageDto.getProductName() == null || pageDto.getProductName().isEmpty()) {
             pageDto.setProductName(null);
         }
@@ -57,6 +60,17 @@ public class ProductServiceImpl implements ProductService {
         }
         if (token == null || token.isEmpty()) {
             token = null;
+        }
+        if (pageDto.getCategory() == null && pageDto.getProductName() == null && token == null) {
+            ResponseData responseData = redisApi.getProduct(Product_Key_Map,pageDto.getPageNo(),pageDto.getPageSize());
+            if ( responseData != null && responseData.status_code == 200 && responseData.data != null) {
+                return ResponseData
+                        .builder()
+                        .message("Ok")
+                        .status_code(200)
+                        .data(responseData.data)
+                        .build();
+            }
         }
             return ResponseData
                     .builder()
@@ -75,8 +89,6 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ResponseData insertProduct(String product,List<MultipartFile> fileList,String token)  {
-
-
         if (fileList != null && !fileList.isEmpty()) {
             List<String> images = new ArrayList<>();
             for (MultipartFile file : fileList) {
@@ -114,12 +126,8 @@ public class ProductServiceImpl implements ProductService {
                     .message("ok")
                     .data("create_ok")
                     .build();
-
         }
         return null;
-
-
-
     }
 
     @Override
@@ -199,7 +207,6 @@ public class ProductServiceImpl implements ProductService {
 
         for (ProductRequest productRequest : productRequests) {
             ProductDto product = productDao.selectProductById(productRequest.getProductId());
-
             if (product == null) {
                 return ResponseData.builder()
                         .message("Product not found with ID: " + productRequest.getProductId())
@@ -214,7 +221,6 @@ public class ProductServiceImpl implements ProductService {
                         .data("bad request")
                         .build();
             }
-
             int newQuantity = product.getProduct_quantity() - productRequest.getQuantity();
             if (newQuantity < 0) {
                 return ResponseData.builder()
@@ -223,17 +229,26 @@ public class ProductServiceImpl implements ProductService {
                         .data("insufficient stock")
                         .build();
             }
-
-
             productDao.updateProduct(productRequest.getProductId(), newQuantity);
         }
-
         return ResponseData.builder()
                 .message("Products updated successfully.")
                 .status_code(200)
                 .data("OK")
                 .build();
     }
-
+    @Scheduled(cron = "0 0 0 * * ?")
+    public void add_product_in_redis (){
+       ResponseData responseData =  redisApi.deleteProduct(Product_Key_Map);
+       if (responseData.status_code == 200){
+           List<ProductDto>productDtoList = productDao.getAllProducts(true);
+           redisApi.saveProduct(Product_Key_Map,productDtoList);
+       }
+    }
+    @Scheduled(cron = "0 * * * * *")
+    private void updateProduct(){
+        List<ProductDto> productDtoList = productDao.getAllProducts(false);
+        redisApi.updateProduct(Product_Key_Map,productDtoList);
+    }
 
 }

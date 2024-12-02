@@ -24,4 +24,10 @@ public class Utils {
             return data;
         }
     }
+    public static boolean check_key (String key){
+        if (key == null || key.isEmpty()){
+            return false;
+        }
+        return true;
+    }
 }

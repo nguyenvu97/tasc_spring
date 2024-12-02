@@ -24,5 +24,5 @@ public class Cart  implements Serializable {
     private String category_name;
     private String description;
     private String store_id;
-    private String user_id;
+//    private String user_id;
 }

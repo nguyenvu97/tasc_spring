@@ -25,8 +25,8 @@ public interface CartMapper extends MapperAll<Cart, ProductDto> {
     @Override
     List<ProductDto> toListDto(List<Cart> e);
 
-    @Mappings({
-            @Mapping(target = "user_id",expression = "java(user_id)")
-    })
-    Cart toDto(ProductDto productDto,String user_id);
+//    @Mappings({
+//            @Mapping(target = "user_id",expression = "java(user_id)")
+//    })
+//    Cart toDto(ProductDto productDto,String user_id);
 }

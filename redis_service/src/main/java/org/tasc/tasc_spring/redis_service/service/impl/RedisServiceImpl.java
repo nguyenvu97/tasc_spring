@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import static org.tasc.tasc_spring.redis_service.javaUtils.Utils.check_key;
 import static org.tasc.tasc_spring.redis_service.javaUtils.Utils.get_data_redis;
 
 @Service
@@ -91,7 +92,6 @@ public class RedisServiceImpl  implements RedisService {
                 .data("")
                 .build();
     }
-
     @Override
     public ResponseData countCart(String key, String user_id) {
         List<Cart> data = (List<Cart>) get_data_redis(key, user_id,redisTemplate);
@@ -113,6 +113,14 @@ public class RedisServiceImpl  implements RedisService {
 
     @Override
     public ResponseData getInRedis(String key, String userId) {
+        if (!check_key(key)){
+            ResponseData
+                    .builder()
+                    .message("key not exist")
+                    .status_code(404)
+                    .data("ok")
+                    .build();
+        }
         try{
             List<Cart> data = (List<Cart>) get_data_redis(key, userId,redisTemplate);
             if (data == null || data.isEmpty()) {
@@ -125,20 +133,28 @@ public class RedisServiceImpl  implements RedisService {
             return ResponseData.builder()
                     .status_code(200)
                     .message("Success")
-                    .data(redisTemplate.opsForHash().get(key, userId)) // If data is not null, retrieve from Redis
+                    .data(redisTemplate.opsForHash().get(key, userId))
                     .build();
 
         }catch (InvalidCallException e){
             return ResponseData.builder()
-                    .status_code(500)  // 500 Internal Server Error
+                    .status_code(500)
                     .message("Error communicating with Redis")
-                    .data("")  // Trả về data rỗng nếu không thể truy cập Redis
+                    .data("")
                     .build();
         }
     }
 
     @Override
     public ResponseData saveInRedis(String key, String user_id , Cart value, long time) {
+        if (!check_key(key)){
+            ResponseData
+                    .builder()
+                    .message("key not exist")
+                    .status_code(404)
+                    .data("ok")
+                    .build();
+        }
         List<Cart> data = (List<Cart>) get_data_redis(key, user_id,redisTemplate);
         try{
             if(data == null || data.isEmpty()) {
@@ -152,7 +168,6 @@ public class RedisServiceImpl  implements RedisService {
                         .message("Success")
                         .data("ok")
                         .build();
-
             }else {
                 if(data.size() >20){
                     ResponseData
@@ -169,8 +184,6 @@ public class RedisServiceImpl  implements RedisService {
                             }
                         })
                         .anyMatch(c -> c.getProduct_id().equals(value.getProduct_id()));
-
-
                 if (!productExists) {
                     data.add(value);
                 }
@@ -195,10 +208,5 @@ public class RedisServiceImpl  implements RedisService {
 
         
     }
-//    private List<Cart> getAll(String key, String user_id){
-//        var data = redisTemplate.opsForHash().get(key, user_id);
-//        List<Cart> carts = (List<Cart>) data;
-//
-//        return carts;
-//    }
+
 }

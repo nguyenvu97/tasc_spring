@@ -37,10 +37,8 @@ public class ProductController {
     public ResponseEntity<?>add(@RequestParam(value = "product") String product,
                                 @RequestParam(required = false,value = "image") List<MultipartFile> files,
                                 @RequestHeader(value = "Authorization" )String token){
-
         return ResponseEntity.ok().body(productService.insertProduct(product,files,token));
     }
-
     @DeleteMapping
     public ResponseEntity<?>delete(@RequestParam String product_id){
         return ResponseEntity.ok().body(productService.deleteProduct(product_id));

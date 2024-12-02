@@ -16,7 +16,9 @@ public interface OrderMapper extends MapperAll<Order, OrderDto> {
     Order toDto(OrderDto orderDto);
 
     @Override
-
+    @Mappings({
+            @Mapping(source = "order.orderDetailsList", target = "orderDetailsList"),
+    })
     OrderDto toEntity(Order order);
 
 

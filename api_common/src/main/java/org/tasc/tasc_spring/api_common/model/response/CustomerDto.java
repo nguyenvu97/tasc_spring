@@ -21,5 +21,12 @@ public class CustomerDto implements Serializable {
     public long iat;
     @JsonProperty("role")
     private String role;
+    @JsonProperty("name")
+    private String fullName;
+    @JsonProperty("phone")
+    private String phone;
+    @JsonProperty("address")
+    private String address;
+
 
 }

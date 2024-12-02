@@ -1,6 +1,7 @@
 package org.tasc.tesc_spring.api_getway.config;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
 
@@ -32,6 +33,7 @@ public class TokenValidator {
         }
     }
         public Claims isValidToken(String token) {
+        try{
             Claims  claims = Jwts
                     .parserBuilder()
                     .setSigningKey(getPublicKey(public_key))
@@ -39,6 +41,10 @@ public class TokenValidator {
                     .parseClaimsJws(token)
                     .getBody();
             return claims;
+        }catch (ExpiredJwtException e ){
+            return null;
+        }
+
 
 
     }
